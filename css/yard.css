@@ -39,7 +39,7 @@
 @keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 18%{ opacity:.85 } 100%{ opacity:0; transform:translateY(-120px) } }
 
 /* ---- a machine: 0-size anchor at the GROUND point; plot+shadow ground it ---- */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:172px; --padw:138px; --seat:20px; --st:1; }
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:152px; --padw:116px; --seat:18px; --st:1; }
 /* flat plot decal — a diamond footprint painted on the ground (never floats) */
 .bldg-plot{ position:absolute; left:0; top:0; width:var(--padw); height:calc(var(--padw)*.56);
   transform:translate(-50%,-50%); clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
