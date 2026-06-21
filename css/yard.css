@@ -3,11 +3,39 @@
    ===================================================================== */
 :root{ --tw:128px; --th:64px; --diamond:polygon(50% 0,100% 50%,50% 100%,0 50%); }
 
-#viewToggle{ margin-left:auto; align-self:center }
+/* ---- always-on centerpiece layout: big YARD + right control column ---- */
+.stage.yard-stage{ grid-template-columns:1fr minmax(322px,384px); align-items:start; }
+.yard-wrap{ position:relative; }
+.side{ display:flex; flex-direction:column; gap:14px; position:sticky; top:104px; max-height:calc(100vh - 122px); overflow:auto; padding-right:2px; }
+.side .panels{ display:block; }
+.yard-cap{ position:absolute; left:12px; top:12px; z-index:6; display:flex; align-items:center; gap:7px;
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; color:var(--bone);
+  background:rgba(7,6,9,.6); padding:4px 9px; box-shadow:inset 0 0 0 1px var(--hair); pointer-events:none; }
 
-.yard{ position:relative; width:100%; aspect-ratio:1/1; max-height:64vh; overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 18%, #111016, #08070a 70%); clip-path:var(--cut);
-  box-shadow:inset 0 0 0 1px var(--hair); touch-action:none; cursor:grab; }
+.yard{ position:relative; width:100%; aspect-ratio:4/3; max-height:74vh; min-height:420px; overflow:hidden;
+  background:radial-gradient(130% 95% at 50% 12%, #15131b, #0a0810 62%, #070509 100%); clip-path:var(--cut);
+  box-shadow:inset 0 0 0 1px var(--hair-2); touch-action:none; cursor:grab; }
+/* molten "lava river" frame — flowing gold/orange around the base (neon-as-reward stays; this is the gold accent alive) */
+.yard::before{ content:""; position:absolute; inset:-2px; z-index:-1; clip-path:var(--cut);
+  background:linear-gradient(115deg,#ff6a00,var(--gold-hi),#ff3d00,var(--gold),#ff8c1a); background-size:320% 320%;
+  filter:saturate(1.15) blur(.5px); opacity:.55; animation:lavaflow 9s linear infinite; }
+@keyframes lavaflow{ to{ background-position:320% 0 } }
+.yard::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
+  box-shadow:inset 0 0 70px rgba(245,166,35,.10), inset 0 -40px 80px rgba(0,0,0,.5); clip-path:var(--cut); }
+
+/* drifting clouds / fog over the yard */
+.yard-sky{ position:absolute; inset:0; z-index:4; overflow:hidden; pointer-events:none; }
+.yard-sky i{ position:absolute; border-radius:50%; background:radial-gradient(ellipse, rgba(180,170,200,.10), transparent 70%);
+  filter:blur(6px); animation:cloudDrift linear infinite; }
+.yard-sky i:nth-child(1){ width:240px; height:90px; top:8%; left:-30%; animation-duration:42s }
+.yard-sky i:nth-child(2){ width:180px; height:70px; top:24%; left:-30%; animation-duration:58s; animation-delay:-20s; opacity:.7 }
+.yard-sky i:nth-child(3){ width:300px; height:110px; top:2%; left:-30%; animation-duration:74s; animation-delay:-46s; opacity:.5 }
+@keyframes cloudDrift{ to{ transform:translateX(180vw) } }
+/* a couple of rising embers (ambient life, capped) */
+.yard-fx::before,.yard-fx::after{ content:""; position:absolute; bottom:18%; width:3px; height:3px; border-radius:50%;
+  background:var(--gold-hi); box-shadow:0 0 6px var(--gold); opacity:0; animation:ember 5.5s ease-in infinite; }
+.yard-fx::before{ left:44% } .yard-fx::after{ left:56%; animation-delay:-2.7s }
+@keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 15%{ opacity:.9 } 100%{ opacity:0; transform:translateY(-120px) } }
 .yard:active{ cursor:grabbing }
 .yard-cam{ position:absolute; inset:0; transform-origin:0 0; will-change:transform }
 .yard-ground{ position:absolute; inset:0; pointer-events:none;
@@ -74,7 +102,9 @@
   font-family:var(--mono); font-size:.56rem; color:var(--dim); box-shadow:inset 0 0 0 1px var(--hair-2); cursor:help }
 
 @media (max-width:880px){
-  .yard{ max-height:52vh }
+  .stage.yard-stage{ grid-template-columns:1fr; }
+  .side{ position:static; max-height:none; overflow:visible; }
+  .yard{ aspect-ratio:1/1; max-height:56vh; min-height:340px; }
   .inspector{ position:fixed; left:0; right:0; bottom:78px; top:auto; width:auto; border-radius:0;
     transform:translateY(130%); clip-path:var(--cut) }
   .inspector.open{ transform:none }

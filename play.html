@@ -53,16 +53,31 @@
 <div class="tickerbar"><div class="ticker-track" id="ticker"></div></div>
 
 <!-- ===== STAGE ===== -->
-<div class="stage">
+<div class="stage yard-stage">
 
-  <!-- RAIL -->
-  <aside class="rail">
-    <div class="hero-card">
-      <video class="hero-media" id="heroLoop" autoplay muted loop playsinline poster="assets/img/hero.png">
-        <source src="assets/video/hero_loop.mp4" type="video/mp4">
-      </video>
-      <img class="hero-media fallback" src="assets/img/hero.png" alt="">
-      <div class="hero-cap"><span class="live-dot"></span> THE FLOOR IS LIVE</div>
+  <!-- YARD — the always-on, alive centerpiece -->
+  <div class="yard-wrap">
+    <div class="yard-sky" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div id="yard" class="yard">
+      <div id="yardCam" class="yard-cam">
+        <div id="yardGround" class="yard-ground"></div>
+        <div id="yardTiles" class="yard-tiles"></div>
+        <svg id="yardLinks" class="yard-links"></svg>
+        <div id="yardBldgs" class="yard-bldgs"></div>
+        <div id="yardFx" class="yard-fx"></div>
+      </div>
+      <div class="yard-cap"><span class="live-dot"></span> THE YARD · LIVE</div>
+      <button id="yardRecenter" class="ghost-btn small recenter">RECENTER</button>
+    </div>
+    <aside id="inspector" class="inspector"></aside>
+  </div>
+
+  <!-- SIDE — controls + the upgrade list -->
+  <aside class="side">
+    <div class="stat-strip">
+      <div class="stat"><b id="sMult">×1.00</b><span>boost</span></div>
+      <div class="stat"><b id="sPrest">0</b><span>cash-outs</span></div>
+      <div class="stat"><b id="sTier">T0</b><span>top tier</span></div>
     </div>
 
     <div class="ship-box">
@@ -71,35 +86,15 @@
         <span class="ship-label">SHIP IT</span>
         <span class="ship-sub" id="shipPayout">—</span>
       </button>
-      <div class="ship-note">Reset the floor → keep a permanent boost + a $GRIND drop. Run it back stronger.</div>
+      <div class="ship-note">Wipe the yard → keep a permanent boost + a $GRIND drop. Run it back stronger.</div>
     </div>
 
-    <div class="stat-strip">
-      <div class="stat"><b id="sMult">×1.00</b><span>boost</span></div>
-      <div class="stat"><b id="sPrest">0</b><span>cash-outs</span></div>
-      <div class="stat"><b id="sTier">T0</b><span>top tier</span></div>
-    </div>
-  </aside>
+    <main class="panels">
 
-  <!-- PANELS -->
-  <main class="panels">
-
-    <!-- FLOOR -->
+    <!-- FLOOR / MACHINES LIST -->
     <section class="panel active" data-panel="floor">
-      <div class="panel-head"><h2 id="floorTitle">THE FLOOR</h2><p id="floorSub">Drop machines. Junk in, money out.</p>
-        <button id="viewToggle" class="ghost-btn small">YARD VIEW</button></div>
-      <div id="yard" class="yard" hidden>
-        <div id="yardCam" class="yard-cam">
-          <div id="yardGround" class="yard-ground"></div>
-          <div id="yardTiles" class="yard-tiles"></div>
-          <svg id="yardLinks" class="yard-links"></svg>
-          <div id="yardBldgs" class="yard-bldgs"></div>
-          <div id="yardFx" class="yard-fx"></div>
-        </div>
-        <button id="yardRecenter" class="ghost-btn small recenter">RECENTER</button>
-      </div>
+      <div class="panel-head"><h2 id="floorTitle">MACHINES</h2><p id="floorSub">Tap a machine on the yard, or build &amp; upgrade here.</p></div>
       <div id="lines" class="lines"></div>
-      <aside id="inspector" class="inspector"></aside>
     </section>
 
     <!-- BLUEPRINTS -->
@@ -143,7 +138,8 @@
       <div class="danger-zone"><button id="resetBtn" class="ghost-btn small">WIPE HOUSE</button></div>
     </section>
 
-  </main>
+    </main>
+  </aside>
 </div>
 
 <!-- ===== OBJECTIVE NUDGE BAR (FTUE) ===== -->

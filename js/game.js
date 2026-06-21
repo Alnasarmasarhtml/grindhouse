@@ -44,7 +44,7 @@ export const Game = {
       }
     }
     this.renderStructure();
-    Yard.setView(this.state.onboardDone && GH.flags.yardView ? "yard" : "list");
+    Yard.fitToViewport();
     this._lastTs = performance.now();
     requestAnimationFrame(this.tick.bind(this));
     window.addEventListener("beforeunload", () => save(this.state, true));

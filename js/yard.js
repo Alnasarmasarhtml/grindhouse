@@ -22,11 +22,9 @@ export function getBuildingEl(lineId) { return document.getElementById(`bldg-${l
 export function mountYard(game) {
   G = game;
   const yard = $("#yard"); if (!yard) return;
-  mounted = true;
-  // view toggle (list <-> yard); list stays default through FTUE
-  $("#viewToggle")?.addEventListener("click", () => setView(activeView === "yard" ? "list" : "yard"));
+  mounted = true; activeView = "yard";          // the yard is the always-on centerpiece
   $("#yardRecenter")?.addEventListener("click", () => fitToViewport());
-  // delegated tap on buildings
+  // delegated tap on buildings → inspector
   $("#yardBldgs")?.addEventListener("click", (e) => {
     const b = e.target.closest(".bldg"); if (!b) return;
     openInspector(b.dataset.line);
@@ -36,33 +34,11 @@ export function mountYard(game) {
     const ins = $("#inspector");
     if (ins?.classList.contains("open") && !e.target.closest("#inspector") && !e.target.closest(".bldg")) closeInspector();
   });
-  // simple drag-to-pan (desktop + touch)
   bindPan(yard);
-  // auto-default to yard for veterans (post-FTUE)
-  if (GH.flags?.yardView && game.state?.onboardDone) activeView = "yard";
 }
 
-export function setView(v) {
-  activeView = v;
-  const yard = $("#yard"), lines = $("#lines"), toggle = $("#viewToggle");
-  const title = $("#floorTitle"), sub = $("#floorSub");
-  if (v === "yard") {
-    if (yard) yard.hidden = false;
-    if (lines) lines.style.display = "none";
-    if (toggle) toggle.textContent = "LIST VIEW";
-    if (title) title.textContent = "THE YARD";
-    if (sub) sub.textContent = "Your factory. Tap a machine to build it up.";
-    if (!built) renderYard(G.state, G.flows, G);
-    refreshYard(G.state, G.flows);
-    fitToViewport();
-  } else {
-    if (yard) yard.hidden = true;
-    if (lines) lines.style.display = "";
-    if (toggle) toggle.textContent = "YARD VIEW";
-    if (title) title.textContent = "THE FLOOR";
-    if (sub) sub.textContent = "Drop machines. Junk in, money out.";
-  }
-}
+// kept for compatibility; yard is always visible now → just (re)fit
+export function setView() { if (!built) renderYard(G.state, G.flows, G); refreshYard(G.state, G.flows); fitToViewport(); }
 
 // ---- build once ----
 export function renderYard(state, flows, game) {
@@ -104,7 +80,7 @@ export function renderYard(state, flows, game) {
 
 // ---- surgical update ----
 export function refreshYard(state, flows) {
-  if (!mounted || activeView !== "yard" || !built) return;
+  if (!mounted || !built) return;
   LINES.forEach((L, i) => {
     const b = document.getElementById(`bldg-${L.id}`); if (!b) return;
     const ls = state.lines[L.id];
@@ -175,6 +151,7 @@ function renderInspector() {
 export function fitToViewport() {
   const yard = $("#yard"), camEl = $("#yardCam"); if (!yard || !camEl) return;
   const vw = yard.clientWidth, vh = yard.clientHeight;
+  if (!vw || !vh) { requestAnimationFrame(fitToViewport); return; }   // wait for layout
   const z = Math.min(vw / CONTENT_W, vh / CONTENT_H, 1.4);
   cam.z = Math.max(0.5, z);
   cam.px = (vw - CONTENT_W * cam.z) / 2;
