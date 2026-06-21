@@ -88,7 +88,7 @@ export const GH = {
   /* ---------------- ECONOMY KNOBS ---------------- */
   economy: {
     startingCash: 50,             // enough to place your first machine
-    costGrowth: 1.09,             // cost_next = base * growth^owned  (gentle)
+    costGrowth: 1.11,             // cost_next = base * growth^owned (Moderate — steeper so you can't max in 30 min; ~3x slower than 1.09 to stack a line)
     sellTickMs: 1000,             // how often the dock sells / cash ticks
     offlineCapHours: 4,           // base offline accrual cap
     offlineCapHoursStaking: 12,   // while staking
