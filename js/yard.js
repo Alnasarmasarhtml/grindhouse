@@ -34,7 +34,15 @@ export function mountYard(game) {
   });
   $("#insScrim")?.addEventListener("click", closeInspector);
   bindPan(yard);
-  window.addEventListener("resize", () => fitToViewport());
+  setHudOffset();
+  window.addEventListener("resize", () => { setHudOffset(); fitToViewport(); });
+}
+
+// measure the sticky HUD + ticker so the map pins exactly beneath them
+function setHudOffset() {
+  const hud = document.querySelector(".hud"), tick = document.querySelector(".tickerbar");
+  const h = (hud ? hud.offsetHeight : 0) + (tick ? tick.offsetHeight : 0);
+  if (h) document.documentElement.style.setProperty("--hud-h", h + "px");
 }
 
 // kept for compatibility; yard is always visible → just (re)fit
@@ -58,8 +66,9 @@ export function renderYard(state, flows, game) {
     b.id = `bldg-${L.id}`; b.dataset.line = L.id; b.dataset.tier = i;
     b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(L.id));
     b.innerHTML = `
-      <img class="pad-art" src="assets/iso/pad.webp" alt="" draggable="false" loading="lazy">
+      <span class="bldg-plot"></span>
       <span class="ready-ring"></span>
+      <span class="bldg-shadow"></span>
       <img class="bldg-art" src="${artSrc(L.id, cp)}" alt="${L.machine}" draggable="false" loading="lazy"
            onerror="this.onerror=null;this.src='${L.icon}'">
       <span class="bldg-lock">🔒</span>

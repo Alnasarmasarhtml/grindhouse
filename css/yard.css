@@ -4,10 +4,14 @@
    Machines sit on its real flat slabs, each on its own foundation pad.
    ===================================================================== */
 
-/* ---- always-on centerpiece layout: big YARD + right control column ---- */
-.stage.yard-stage{ grid-template-columns:1fr minmax(322px,384px); align-items:start; }
-.yard-wrap{ position:relative; }
-.side{ display:flex; flex-direction:column; gap:14px; position:sticky; top:104px; max-height:calc(100vh - 122px); overflow:auto; padding-right:2px; }
+/* ---- full-bleed layout: a HUGE sticky map + a scrolling control column ----
+   The map fills the viewport and stays fixed while the machine column scrolls. */
+.stage.yard-stage{ max-width:none; margin:0; padding:0; gap:0;
+  grid-template-columns:1fr clamp(384px,32vw,520px); align-items:start; }
+.yard-wrap{ position:sticky; top:var(--hud-h,90px); height:calc(100vh - var(--hud-h,90px));
+  padding:12px 0 12px 12px; }
+.side{ display:flex; flex-direction:column; gap:14px; min-width:0; padding:16px 16px 100px;
+  border-left:1px solid var(--hair); background:linear-gradient(180deg, rgba(12,11,15,.5), transparent 280px); }
 .side .panels{ display:block; }
 .yard-cap{ position:absolute; left:12px; top:12px; z-index:6; display:flex; align-items:center; gap:7px;
   font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; color:var(--bone);
@@ -15,7 +19,7 @@
   backdrop-filter:blur(2px); }
 
 /* ---- the viewport ---- */
-.yard{ position:relative; width:100%; aspect-ratio:16/9; max-height:80vh; min-height:360px; overflow:hidden;
+.yard{ position:relative; width:100%; height:100%; min-height:0; overflow:hidden;
   background:#06060a; clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2); touch-action:none; cursor:grab; }
 .yard:active{ cursor:grabbing; }
 /* edge vignette so machines read against the bright lava */
@@ -34,15 +38,25 @@
 .yard-fx::before{ left:46% } .yard-fx::after{ left:54%; animation-delay:-3s }
 @keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 18%{ opacity:.85 } 100%{ opacity:0; transform:translateY(-120px) } }
 
-/* ---- a machine: 0-size anchor at the plot (= pad centre); art rises above ---- */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:112px; --padw:92px; --st:1; }
-.pad-art{ position:absolute; left:0; top:0; width:var(--padw); max-width:none; transform:translate(-50%,-50%);
-  filter:drop-shadow(0 8px 10px rgba(0,0,0,.5)); pointer-events:none; -webkit-user-drag:none; transition:filter .3s; }
+/* ---- a machine: 0-size anchor at the GROUND point; plot+shadow ground it ---- */
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:172px; --padw:138px; --seat:20px; --st:1; }
+/* flat plot decal — a diamond footprint painted on the ground (never floats) */
+.bldg-plot{ position:absolute; left:0; top:0; width:var(--padw); height:calc(var(--padw)*.56);
+  transform:translate(-50%,-50%); clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+  background:linear-gradient(180deg, rgba(34,31,40,.5), rgba(8,7,11,.72));
+  box-shadow:inset 0 0 0 1.5px rgba(245,166,35,.30), inset 0 0 20px rgba(0,0,0,.55);
+  pointer-events:none; transition:box-shadow .3s; }
+/* soft contact shadow — plants the machine on the plot */
+.bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.86); height:calc(var(--padw)*.4);
+  transform:translate(-50%,-48%); border-radius:50%;
+  background:radial-gradient(ellipse, rgba(0,0,0,.62), rgba(0,0,0,.28) 55%, transparent 74%);
+  filter:blur(3px); pointer-events:none; }
 .bldg-art{ position:absolute; left:0; top:0; width:var(--bw); max-width:none; transform-origin:50% 100%;
-  transform:translate(-50%, calc(-100% + 18px)) scale(var(--st));
-  filter:drop-shadow(0 10px 16px rgba(0,0,0,.45)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
-.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + 14px)) scale(calc(var(--st)*1.03)); }
-.bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + 18px)) scale(calc(var(--st)*.98)); }
+  transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--st));
+  filter:drop-shadow(0 6px 7px rgba(0,0,0,.5)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
+.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat) - 4px)) scale(calc(var(--st)*1.03)); }
+.bldg:hover .bldg-plot{ box-shadow:inset 0 0 0 1.5px rgba(245,166,35,.6), inset 0 0 20px rgba(0,0,0,.55); }
+.bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st)*.98)); }
 /* evolution stages: the machine visibly grows as it levels up */
 .bldg.stage-0{ --st:.92 } .bldg.stage-1{ --st:1.06 } .bldg.stage-2{ --st:1.24 } .bldg.stage-3{ --st:1.46 }
 .bldg.evolving .bldg-art{ animation:evolvePop .55s cubic-bezier(.2,.9,.3,1.2); }
@@ -52,7 +66,8 @@
   100%{ transform:translate(-50%, calc(-100% + 18px)) scale(var(--st)); filter:none } }
 /* locked machines: dim ghost on a cold pad */
 .bldg.locked .bldg-art{ filter:grayscale(.92) brightness(.42); }
-.bldg.locked .pad-art{ filter:grayscale(.7) brightness(.6); }
+.bldg.locked .bldg-plot{ box-shadow:inset 0 0 0 1.5px rgba(120,120,130,.22), inset 0 0 20px rgba(0,0,0,.6); opacity:.7; }
+.bldg.locked .bldg-shadow{ opacity:.55; }
 .bldg.locked .bldg-lock{ display:block; }
 .bldg.locked .bldg-rate{ display:none; }
 
@@ -136,8 +151,9 @@
 /* ---- mobile: stack + bottom-sheet modal ---- */
 @media (max-width:880px){
   .stage.yard-stage{ grid-template-columns:1fr; }
-  .side{ position:static; max-height:none; overflow:visible; }
-  .yard{ aspect-ratio:4/3; max-height:62vh; min-height:320px; }
+  .yard-wrap{ position:static; height:auto; padding:10px 10px 0; }
+  .side{ position:static; height:auto; border-left:0; padding:14px 12px 96px; background:none; }
+  .yard{ aspect-ratio:4/3; height:auto; max-height:62vh; min-height:320px; }
   .inspector{ left:0; right:0; top:auto; bottom:0; width:auto; max-width:none; clip-path:var(--cut);
     transform:translateY(110%); }
   .inspector.open{ transform:translateY(0); }

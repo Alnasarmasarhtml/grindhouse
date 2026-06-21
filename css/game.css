@@ -81,7 +81,7 @@
 
 /* ---------------- MACHINE CARDS (spec-sheet tiles) ---------------- */
 .lines{display:grid;gap:11px}
-.card{position:relative;display:grid;grid-template-columns:74px 1fr 150px;gap:15px;align-items:center;padding:13px;
+.card{position:relative;display:grid;grid-template-columns:58px minmax(0,1fr) 140px;gap:12px;align-items:center;padding:12px;
   background:var(--panel);clip-path:var(--cut);box-shadow:inset 0 0 0 1px var(--hair);transition:box-shadow .25s,transform .1s;
   filter:saturate(.5) brightness(.86)}
 .card.owned{filter:none;box-shadow:inset 0 0 0 1px var(--hair-2)}
@@ -89,14 +89,14 @@
 .card .card-glow{display:none}
 .card::before{content:"";position:absolute;top:6px;right:7px;width:11px;height:11px;border-top:1.4px solid var(--edge);border-right:1.4px solid var(--edge);opacity:.45;pointer-events:none}
 
-.card-icon{position:relative;width:74px;height:74px;overflow:hidden;clip-path:var(--cut-sm);background:#08070a;box-shadow:inset 0 0 0 1px var(--hair)}
+.card-icon{position:relative;width:58px;height:58px;overflow:hidden;clip-path:var(--cut-sm);background:#08070a;box-shadow:inset 0 0 0 1px var(--hair)}
 .card-icon img{width:100%;height:100%;object-fit:cover;filter:grayscale(.85) brightness(.7);transition:filter .3s}
 .card.owned .card-icon img{filter:none}
 .tier-badge{position:absolute;left:4px;top:4px;font-family:var(--mono);font-size:.56rem;font-weight:700;background:rgba(7,6,9,.82);padding:1px 5px;color:var(--gold-hi)}
 
 .card-main{min-width:0}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.machine{font-family:var(--disp);font-stretch:125%;font-weight:800;font-size:1.02rem;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.machine{font-family:var(--disp);font-stretch:125%;font-weight:800;font-size:.96rem;letter-spacing:-.01em;line-height:1.08;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .owned-pill{font-family:var(--mono);font-size:.74rem;color:var(--gold-hi);box-shadow:inset 0 0 0 1px var(--hair-2);padding:1px 7px;flex:0 0 auto}
 .card-sub{font-size:.76rem;color:var(--mut);margin:2px 0 8px;letter-spacing:.01em}
 .card-sub b{color:var(--bone)}
@@ -115,7 +115,8 @@
 .btn.buy.can{box-shadow:inset 0 0 0 1.3px var(--gold);color:var(--gold-hi)}.btn.buy.can .cost{color:var(--gold-hi)}
 .buy-split{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .btn.mini{padding:.42em;font-size:.68rem}.btn.mini.can{box-shadow:inset 0 0 0 1.3px var(--gold);color:var(--gold-hi)}
-.btn.oc{flex-direction:row;justify-content:space-between;gap:6px}.btn.oc .lbl{flex:1;text-align:left}
+.btn.oc{display:grid;grid-template-columns:1fr auto;grid-template-areas:"lbl hlp" "lvl cost";gap:0 6px;align-items:center;text-align:left}
+.btn.oc .lbl{grid-area:lbl}.btn.oc .oc-lvl{grid-area:lvl;justify-self:start}.btn.oc .cost{grid-area:cost;justify-self:end}.btn.oc .hlp{grid-area:hlp;margin:0}
 .btn.oc-lvl,.oc-lvl{color:var(--gold-hi)}
 .btn.oc.can{box-shadow:inset 0 0 0 1.3px var(--gold);color:var(--gold-hi)}
 .btn .hlp{display:inline-grid;place-items:center;width:14px;height:14px;flex:0 0 auto;border-radius:50%;
