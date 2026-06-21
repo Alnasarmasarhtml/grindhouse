@@ -20,7 +20,8 @@ export function freshState() {
     cash: GH.economy.startingCash,
     runCash: 0,            // cash earned THIS run (drives prestige)
     lifetimeCash: 0,       // cash earned across all runs (achievements)
-    grind: 0,              // banked claimable $GRIND
+    grind: 0,              // pre-launch: DEMO mirror only (NOT claimable, resets at launch). live: display mirror of /api/accrual (server-authoritative)
+    demoScore: 0,          // off-chain practice score earned from gameplay pre-launch — never a token entitlement
     lifetimeGrind: 0,
     lines,
     prestigeWeight: 0,
@@ -33,6 +34,10 @@ export function freshState() {
     stats: { totalMerges: 0, totalPulls: 0, bestRarity: -1 },
     settings: { sound: GH.flags.soundDefaultOn },
     wallet: null,          // connected pubkey (string) once linked
+    license: { active: false, tier: null, sig: null, epoch: -1, ts: 0 }, // per-epoch Operator License (live)
+    epochDripStart: 0,     // when the current epoch's drip began (license ts) — UI estimate only
+    lastClaimTs: 0,
+    lifetimeClaimed: 0,
     onboarded: false,      // has seen the welcome/how-to-play card
     onboardDone: false,    // has cleared the full objective-nudge sequence
     createdTs: now,
@@ -62,6 +67,7 @@ function reconcile(s) {
   merged.stats = { ...base.stats, ...(s.stats || {}) };
   merged.settings = { ...base.settings, ...(s.settings || {}) };
   merged.staking = { ...base.staking, ...(s.staking || {}) };
+  merged.license = { ...base.license, ...(s.license || {}) };
   merged.blueprints = s.blueprints || {};
   merged.achievements = s.achievements || {};
   return merged;

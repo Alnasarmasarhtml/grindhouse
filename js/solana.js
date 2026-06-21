@@ -1,11 +1,12 @@
 /* =====================================================================
    GRIND HOUSE — Solana wallet + token layer
-   Works TODAY for wallet connect. Token claim/deposit/stake are wired
-   but gated on config: pre-launch, $GRIND is a banked claimable balance;
-   at TGE you flip GH.token.launched + paste the mint + treasury and the
-   live paths turn on. No code changes needed beyond config.js.
+   Works TODAY for wallet connect. Activation/claim/spend are wired but
+   gated on config: pre-launch this is a free DEMO (the in-game number is a
+   practice score, NOT a claimable token). At launch you bind the mint +
+   treasury + backend (api) + oracle in config.js and the live, server-
+   authoritative paths turn on. Real earning needs the backend, not just a flag.
    ===================================================================== */
-import { GH, isLive, canClaim } from "./config.js";
+import { GH, isLive, canClaim, isActivated, apiBase, currentEpoch } from "./config.js";
 import { fmtGrind, shortKey } from "./format.js";
 import { save } from "./save.js";
 
@@ -48,6 +49,69 @@ export async function disconnect(game) {
   try { await provider?.disconnect?.(); } catch (_) {}
   game.state.wallet = null; save(game.state, true); refreshWalletUI(game.state);
 }
+export const connectWallet = connect; // alias (parallel to GREYMARKET chain.js)
+
+/* ---------- ACTIVATION — the per-epoch Operator License ("account tax") ----------
+   DEMO: nothing moves on-chain; honest "opens at launch" modal.
+   LIVE: SystemProgram.transfer(feeSol → treasury) for THIS epoch, then the
+   backend verifies the payment landed before licensing the wallet. */
+export async function payActivation(game, tierId = "operator") {
+  const a = GH.chain.activation;
+  const tier = a.tiers.find(t => t.id === tierId) || a.tiers[0];
+  if (!isLive()) { openActivateAtLaunch(tier); return { ok: false, reason: "demo" }; }
+  if (!game.state.wallet) { await connect(game); if (!game.state.wallet) return { ok: false, reason: "no-wallet" }; }
+  try {
+    const web3 = await loadWeb3();
+    const conn = new web3.Connection(GH.token.rpc, "confirmed");
+    const from = new web3.PublicKey(game.state.wallet);
+    const to = new web3.PublicKey(a.receiver || GH.token.treasury);
+    const tx = new web3.Transaction().add(web3.SystemProgram.transfer({
+      fromPubkey: from, toPubkey: to, lamports: Math.round(tier.feeSol * web3.LAMPORTS_PER_SOL),
+    }));
+    tx.feePayer = from; tx.recentBlockhash = (await conn.getLatestBlockhash()).blockhash;
+    const signed = await provider.signTransaction(tx);
+    const sig = await conn.sendRawTransaction(signed.serialize());
+    await conn.confirmTransaction(sig, "confirmed");
+    // backend verifies the transfer landed (amount + payer + epoch) before licensing
+    const resp = await fetch(apiBase() + GH.chain.api.activate, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ wallet: game.state.wallet, sig, tier: tier.id, epoch: currentEpoch() }),
+    });
+    if (!resp.ok) throw new Error("activation not verified");
+    game.state.license = { active: true, tier: tier.id, sig, epoch: currentEpoch(), ts: Date.now() };
+    game.state.epochDripStart = Date.now();
+    save(game.state, true); refreshWalletUI(game.state);
+    return { ok: true, sig, epoch: currentEpoch() };
+  } catch (e) { console.warn("[grindhouse] activation failed", e); openActivateAtLaunch(tier); return { ok: false, reason: String(e) }; }
+}
+
+/* ---------- server-authoritative status (drip/caps/cooldown) ---------- */
+export async function getStatus(pk) {
+  if (!isLive()) return null;
+  try { const r = await fetch(apiBase() + GH.chain.api.status + "?wallet=" + pk); return r.ok ? await r.json() : null; }
+  catch (_) { return null; }
+}
+
+/* ---------- token sink (live = on-chain burn/transfer; demo = caller debits locally) ---------- */
+export async function spendToken(game, sinkId, amount) {
+  if (!isLive()) return { ok: true, demo: true };   // caller does the local sandbox debit
+  if (!game.state.wallet) { await connect(game); if (!game.state.wallet) return { ok: false, reason: "no-wallet" }; }
+  try {
+    const resp = await fetch(apiBase() + GH.chain.api.spend, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ wallet: game.state.wallet, sink: sinkId, amount }),
+    });
+    if (!resp.ok) throw new Error("spend not built");
+    const { txBase64 } = await resp.json();
+    const web3 = await loadWeb3();
+    const tx = web3.Transaction.from(Uint8Array.from(atob(txBase64), c => c.charCodeAt(0)));
+    const signed = await provider.signTransaction(tx);
+    const conn = new web3.Connection(GH.token.rpc, "confirmed");
+    const sig = await conn.sendRawTransaction(signed.serialize());
+    await conn.confirmTransaction(sig, "confirmed");
+    return { ok: true, sig };
+  } catch (e) { console.warn("[grindhouse] spend failed", e); return { ok: false, reason: String(e) }; }
+}
 
 export function refreshWalletUI(state) {
   const btn = $("#walletBtn");
@@ -67,37 +131,42 @@ export function refreshWalletUI(state) {
     }
     const status = $("#bankStatus");
     if (status) status.textContent = isLive()
-      ? "$GRIND is live. Claim your banked balance to your wallet."
-      : "Pre-launch: every gate you clear banks claimable $GRIND. Withdraw at TGE.";
+      ? "$GRIND is live. Activated Operators earn a real, capped weekly drip — claim it to your wallet."
+      : "Free demo. This number is a practice score — NOT claimable $GRIND, and it resets at launch. At TGE, activated Operators earn a real, capped weekly $GRIND drip.";
   }
 }
 
 /* ---------- claim flow ---------- */
 export async function claim(game) {
-  if (!canClaim()) {
-    openClaimAtLaunch();
-    return;
-  }
+  if (!canClaim()) { openClaimAtLaunch(); return; }
   if (!game.state.wallet) { await connect(game); if (!game.state.wallet) return; }
-  // === LIVE PATH (enable at TGE) ===
-  // Server-authoritative: ask backend for a partially-signed claim tx,
-  // co-sign with the wallet, submit. Treasury never trusts the client.
+  if (!isActivated(game.state)) { openActivateAtLaunch(GH.chain.activation.tiers[0]); return; }
+  // === LIVE PATH — SERVER-AUTHORITATIVE ===
+  // The server re-derives the claimable amount from its TIME-DRIP ledger and
+  // returns a partially-signed tx from the capped claim hot wallet. The client
+  // NEVER asserts an amount (that was the old bug). Treasury never trusts the client.
   try {
-    const resp = await fetch("/api/claim", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ wallet: game.state.wallet, amount: game.state.grind }),
+    const nres = await fetch(apiBase() + GH.chain.api.nonce + "?wallet=" + game.state.wallet);
+    if (!nres.ok) throw new Error("nonce endpoint not live");
+    const { nonce } = await nres.json();
+    const resp = await fetch(apiBase() + GH.chain.api.claim, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ wallet: game.state.wallet, nonce }),   // NO amount — server decides
     });
     if (!resp.ok) throw new Error("claim endpoint not live");
-    const { txBase64 } = await resp.json();
+    const { txBase64, amount, burned } = await resp.json();
     const web3 = await loadWeb3();
     const tx = web3.Transaction.from(Uint8Array.from(atob(txBase64), c => c.charCodeAt(0)));
+    try { await provider.signMessage?.(new TextEncoder().encode(`claim:${GH.ticker}:${game.state.wallet}:${nonce}`)); } catch (_) {}
     const signed = await provider.signTransaction(tx);
     const conn = new web3.Connection(GH.token.rpc, "confirmed");
     const sig = await conn.sendRawTransaction(signed.serialize());
     await conn.confirmTransaction(sig, "confirmed");
+    // server watches the chain and debits its ledger once; client just reconciles display
+    game.state.lastClaimTs = Date.now();
+    game.state.lifetimeClaimed = (game.state.lifetimeClaimed || 0) + (amount || 0);
     game.state.grind = 0; save(game.state, true); refreshWalletUI(game.state);
-    alert("Claimed! Tx: " + sig);
+    simpleModal("CLAIMED", `+${fmtGrind(amount || 0)} $GRIND sent to your wallet · ${fmtGrind(burned || 0)} burned (3%).`, "NICE");
   } catch (e) {
     console.warn("[grindhouse] claim path not live yet:", e);
     openClaimAtLaunch();
@@ -133,8 +202,8 @@ function openConnectModal(game, needInstall, name, pk) {
   wrap.innerHTML = `<div class="modal">
     <h2 class="m-title">${needInstall ? "NO SOLANA WALLET FOUND" : "WALLET LINKED"}</h2>
     <p class="m-body">${needInstall
-      ? "Install a Solana wallet to lock in your claimable $GRIND for launch. You don't need one to play — only to withdraw at TGE."
-      : `Linked to <b>${name}</b> · <span class="mono">${shortKey(pk, 5)}</span>. Your banked $GRIND is reserved for this wallet. Grind now, claim at launch.`}</p>
+      ? "You don't need a wallet to play the demo. At launch, connect one to activate an Operator License and earn a real, capped weekly $GRIND drip."
+      : `Linked to <b>${name}</b> · <span class="mono">${shortKey(pk, 5)}</span>. Earning is a free demo until launch — your number is a practice score, not $GRIND.`}</p>
     <div class="m-row">
       ${needInstall
         ? `<a class="cta" href="https://phantom.app/" target="_blank" rel="noopener">GET PHANTOM</a><button class="cta ghost x">LATER</button>`
@@ -145,17 +214,31 @@ function openConnectModal(game, needInstall, name, pk) {
   root.appendChild(wrap); requestAnimationFrame(() => wrap.classList.add("show"));
 }
 
-export function openClaimAtLaunch() {
+/* ---------- shared modal ---------- */
+function simpleModal(title, bodyHtml, btn = "KEEP PLAYING") {
   const root = $("#modalRoot"); if (!root) return;
   const wrap = document.createElement("div"); wrap.className = "modal-wrap";
   wrap.innerHTML = `<div class="modal">
-    <h2 class="m-title">THE TOKEN ISN'T LIVE YET — THAT'S YOUR EDGE.</h2>
-    <p class="m-body">$GRIND launches at TGE. Until then, every gate you clear banks <b>claimable $GRIND</b>. The season pool halves every week, so the earliest houses bank the deepest. Grind now. Claim at launch.</p>
-    <div class="m-row"><button class="cta x">KEEP GRINDING</button></div>
+    <h2 class="m-title">${title}</h2>
+    <p class="m-body">${bodyHtml}</p>
+    <div class="m-row"><button class="cta x">${btn}</button></div>
   </div>`;
   wrap.addEventListener("click", (e) => { if (e.target === wrap || e.target.classList.contains("x")) { wrap.classList.remove("show"); setTimeout(() => wrap.remove(), 200); } });
   root.appendChild(wrap); requestAnimationFrame(() => wrap.classList.add("show"));
 }
 
-// expose claim for the bank button (bound in play.html after import)
+export function openClaimAtLaunch() {
+  simpleModal("THE TOKEN ISN'T LIVE YET — THAT'S YOUR EDGE.",
+    "Right now this is a <b>free practice floor</b> — the number you see is a demo score, <b>not</b> a $GRIND entitlement, and it resets at launch. At TGE, activated <b>Operators</b> earn a real, <b>capped weekly drip</b> of $GRIND (the season pool halves each week — early is real). No wallet drained, no inflation, no rug.");
+}
+
+export function openActivateAtLaunch(tier) {
+  const a = GH.chain.activation;
+  simpleModal(`${a.licenseName.toUpperCase()} — OPENS AT LAUNCH`,
+    `At TGE, a per-season <b>${a.licenseName}</b> (${tier?.feeSol ?? a.feeSol} SOL to the house) unlocks <b>real, capped, claimable $GRIND</b> on a weekly drip — and keeps bots from draining the house, because every farming account has to pay the house first. <b>Right now nothing here is real money</b> — it's a free demo.`);
+}
+
+// expose for the bank/license buttons (bound in play.html after import)
 window.GH_claim = (game) => claim(game);
+window.GH_activate = (game, tier) => payActivation(game, tier);
+window.GH_spend = (game, id, n) => spendToken(game, id, n);

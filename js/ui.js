@@ -214,7 +214,7 @@ function modal(html, cls = "") {
 export function disclaimer(onAck) {
   const m = modal(`
     <h2 class="m-title">BEFORE YOU GRIND — STRAIGHT TALK.</h2>
-    <p class="m-body">$GRIND is a <b>volatile token</b>. GRIND HOUSE is a game — entertainment first. You may earn less than you spend, or nothing. Never spend what you can't afford to lose. Pre-launch, $GRIND is a claimable in-game balance you withdraw at TGE.</p>
+    <p class="m-body">$GRIND is a <b>volatile token</b>. GRIND HOUSE is a game — entertainment first. You may earn less than you spend, or nothing. Never spend what you can't afford to lose. Right now this is a <b>free demo</b>: your number is a practice score, not $GRIND, and it resets at launch.</p>
     <button class="cta big-cta ack">I UNDERSTAND — LET'S GRIND</button>
   `, "disc");
   m.wrap.querySelector(".ack").addEventListener("click", () => { onAck(); m.close(); });
@@ -361,7 +361,7 @@ const NUDGES = [
   { label: "Walled out? Hit SHIP IT for your first $GRIND",
     done:  (st) => st.totalPrestiges >= 1,
     flash: "#shipBtn",
-    toast: "SHIPPED. You just banked real $GRIND — claim it at launch. Run it back." },
+    toast: "SHIPPED. +demo score — real $GRIND drips for licensed Operators at launch. Run it back." },
 ];
 
 let _objIdx = 0, _objInit = false;

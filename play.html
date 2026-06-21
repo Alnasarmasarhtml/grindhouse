@@ -15,6 +15,8 @@
 </head>
 <body class="game-body">
 
+<div id="demoBanner" class="demo-banner">FREE DEMO · off-chain practice build — the number you grind is a <b>demo score, not a token</b>. Nothing here is claimable or financial until launch.</div>
+
 <div class="bg-fx"><div class="bg-grid"></div><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-scan"></div></div>
 
 <!-- ===== HUD ===== -->
@@ -31,7 +33,7 @@
     </div>
     <div class="counter grind" data-help="grind" title="The real Solana coin. Bank it now, claim at launch.">
       <img src="assets/img/token.png" alt="">
-      <div class="c-body"><b id="grind">0</b><small>$GRIND · banked, claim at launch</small></div>
+      <div class="c-body"><b id="grind">0</b><small>$GRIND · demo score</small></div>
     </div>
     <div class="counter energy" data-help="energy" title="Powers big moves. Refills on its own.">
       <img src="assets/img/energy.png" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ic-fallback bolt',textContent:'⚡'}))" alt="">
@@ -40,6 +42,7 @@
   </div>
 
   <div class="hud-actions">
+    <span id="chainBadge" class="chain-badge" title="On-chain status">DEMO</span>
     <button id="walletBtn" class="hbtn wallet">CONNECT WALLET</button>
     <button id="soundBtn" class="hbtn icon" title="Toggle sound">♪</button>
   </div>
@@ -102,19 +105,21 @@
 
     <!-- BANK -->
     <section class="panel" data-panel="bank">
-      <div class="panel-head"><h2>THE VAULT</h2><p>Your banked $GRIND. Claim it to your wallet at launch.</p></div>
+      <div class="panel-head"><h2>THE VAULT</h2><p>Your demo score. At launch, activated Operators claim a real, capped weekly $GRIND drip.</p></div>
       <div id="bankPanel" class="bank">
         <div class="bank-balance">
           <img src="assets/img/token.png" alt="">
-          <div><b id="bankBalance">0</b><span>$GRIND banked · claim at launch</span></div>
+          <div><b id="bankBalance">0</b><span>$GRIND · demo score (not a token yet)</span></div>
         </div>
         <div class="bank-rows">
           <div class="bank-row"><span>Wallet</span><b id="bankWallet">not connected</b></div>
+          <div class="bank-row"><span>Operator License</span><b id="licenseBadge">— opens at launch</b></div>
           <div class="bank-row"><span>On-chain balance</span><b id="onchainBal">—</b></div>
-          <div class="bank-row"><span>Status</span><b id="bankStatus" class="status">Pre-launch</b></div>
+          <div class="bank-row"><span>Status</span><b id="bankStatus" class="status">Free demo</b></div>
         </div>
+        <button id="activateBtn" class="cta ghost">ACTIVATE OPERATOR LICENSE</button>
         <button id="claimBtn" class="cta claim disabled">CLAIM AT LAUNCH</button>
-        <p class="bank-fine">Pre-launch, $GRIND is a claimable balance saved to your wallet. It's a volatile coin — this is a game, not an investment.</p>
+        <p class="bank-fine">Free demo. This number is a practice score — <b>not</b> claimable $GRIND, and it resets at launch. At launch, an activated Operator License (a per-season fee to the house) unlocks a real, capped weekly $GRIND drip — and stops bots from draining the house. A game, not an investment.</p>
       </div>
     </section>
 
@@ -149,10 +154,16 @@
 <script type="module">
   import { Game } from "./js/game.js";
   import { LINES } from "./js/data.js";
-  // bank claim button + live stat strip wiring
+  import { GH, isLive, canClaim } from "./js/config.js";
+  // bank claim/activate buttons + chain badge + live stat strip wiring
   const wire = () => {
     const cb = document.getElementById("claimBtn");
     if (cb) cb.addEventListener("click", () => window.GH_claim && window.GH_claim(Game));
+    const ab = document.getElementById("activateBtn");
+    if (ab) ab.addEventListener("click", () => window.GH_activate && window.GH_activate(Game));
+    const badge = document.getElementById("chainBadge");
+    if (badge) { const live = isLive(); badge.textContent = live ? (canClaim() ? "LIVE" : "LIVE·NO CLAIM") : (GH.token.network === "devnet" ? "DEVNET" : "DEMO"); badge.classList.toggle("live", live); }
+    if (isLive()) document.getElementById("demoBanner")?.remove();
     setInterval(() => {
       if (!Game.state) return;
       const s = Game.state;

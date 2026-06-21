@@ -23,9 +23,14 @@ export const GH = {
     treasury: "",                 // <<< treasury wallet pubkey
     network: "mainnet-beta",      // "mainnet-beta" | "devnet"
     rpc: "https://api.mainnet-beta.solana.com",
-    // pre-launch banked balances become claimable when launched===true
-    claimEnabled: false,          // <<< flip true once claim program is deployed
+    claimEnabled: false,          // <<< flip true once the claim backend+signer is live & devnet-verified
     burnAddress: "1nc1nerator11111111111111111111111111111111",
+    // ---- bind at launch (see docs/LAUNCH.md) — REAL earning also needs the backend below ----
+    programId: "",                // <<< Anchor program (license PDA + claim ceiling)
+    treasuryAta: "",              // <<< treasury $GRIND token account
+    claimHotWallet: "",           // <<< capped hot wallet that pays claims (holds ~1-2 epochs float)
+    api: "",                      // <<< backend base URL (https). "" => DEMO even if launched
+    priceOracle: "",              // <<< DEX/TWAP oracle id for the value-peg. "" => keep claimEnabled false
     links: {
       dexscreener: "",
       pumpfun: "",
@@ -34,6 +39,49 @@ export const GH = {
       telegram: "https://t.me/",
       docs: "#tokenomics",
     },
+  },
+
+  /* ---------------- ON-CHAIN ECONOMY (anti-drain) ----------------
+     The token only enters circulation via a SERVER time-drip → claim,
+     and only for a wallet that paid a per-epoch on-chain license.
+     Gameplay/skill does NOT mint claimable token (client is untrusted).
+     This makes botting EV ≤ 0 at any price. See docs/LAUNCH.md. */
+  chain: {
+    activation: {                  // the "account tax" — kills free botting
+      enabled: true,
+      licenseName: "Operator License",
+      recurring: true,             // per-epoch, not lifetime
+      feeSol: 0.05,                // ~$8/epoch to treasury
+      feeToken: 0,                 // raise >0 (burned) after liquidity so cost scales with price
+      feeTokenBurn: true,
+      tiers: [
+        { id: "operator", feeSol: 0.05, epochCapMult: 1.0, claimCooldownH: 24 },
+        { id: "foreman",  feeSol: 0.25, epochCapMult: 1.8, claimCooldownH: 12 },
+        { id: "kingpin",  feeSol: 1.00, epochCapMult: 3.0, claimCooldownH: 6  },
+      ],
+      refundable: false,
+      receiver: "",                // "" => token.treasury
+    },
+    earn: {
+      mode: "time-drip",           // accrual = f(activation_ts, now, tier) — NOT gameplay
+      epochHours: 168,             // 1 week season epoch
+      epochCapTokens: 8000,        // per-wallet ceiling / epoch
+      valuePegMarginFactor: 0.5,   // claimable VALUE/epoch ≤ 0.5 × fee value (price-independent)
+      globalEpochFaucet: 4_000_000,// FIXED total emittable / epoch across ALL wallets (sybil-proof)
+      globalFaucetHalfLifeEpochs: 1,
+      perAccountLifetimeCap: 12000, // one license can't amortize into profit
+      diminishingAfterPct: 60,
+      minAccountAgeH: 24,
+    },
+    claim: {
+      burnBps: 300,                // 3% burned on claim
+      minClaimTokens: 100,
+      vestHours: 0,
+      perDayTreasuryOutflowCap: 200000,
+    },
+    buyback: { pctOfRevenue: 70 }, // activation SOL + cosmetic SOL → buyback&burn
+    api: { activate: "/api/activate", nonce: "/api/nonce", accrual: "/api/accrual",
+           claim: "/api/claim", spend: "/api/spend", status: "/api/status", price: "/api/price" },
   },
 
   /* ---------------- ECONOMY KNOBS ---------------- */
@@ -86,5 +134,10 @@ export const GH = {
 };
 
 // convenience: are we live on-chain yet?
-export const isLive = () => GH.token.launched === true && !!GH.token.mint;
+// HONEST gate: "live" needs the mint AND the backend (api) AND the value-peg oracle.
+// No backend/oracle => DEMO automatically. There is no half-live state.
+export const isLive = () => GH.token.launched === true && !!GH.token.mint && !!GH.token.api && !!GH.token.priceOracle;
 export const canClaim = () => isLive() && GH.token.claimEnabled === true;
+export const apiBase = () => (GH.token.api || "").replace(/\/$/, "");
+export const currentEpoch = () => Math.floor((Date.now() / 3600000) / GH.chain.earn.epochHours);
+export const isActivated = (s) => !!s?.license?.active && !!s?.license?.sig && (s?.license?.epoch === currentEpoch());
