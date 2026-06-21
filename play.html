@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#08070d">
+<title>GRIND HOUSE — The Floor</title>
+<meta name="description" content="Run the refinery. Grind scrap into $GRIND. The house never sleeps.">
+<link rel="icon" href="assets/img/token.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,500;125,600;125,700;125,800;125,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-body">
+
+<div class="bg-fx"><div class="bg-grid"></div><div class="bg-glow g1"></div><div class="bg-glow g2"></div><div class="bg-scan"></div></div>
+
+<!-- ===== HUD ===== -->
+<header class="hud">
+  <a class="brand" href="index.html" title="GRIND HOUSE">
+    <span class="brand-mark"></span>
+    <span class="brand-name">GRIND<i>HOUSE</i></span>
+  </a>
+
+  <div class="counters">
+    <div class="counter cash" data-help="cash" title="Game money. Sell goods to earn it. Can't be withdrawn.">
+      <img src="assets/img/cash.png" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ic-fallback',textContent:'$'}))" alt="">
+      <div class="c-body"><b id="cash">0</b><small id="cashRate">+$0/s</small></div>
+    </div>
+    <div class="counter grind" data-help="grind" title="The real Solana coin. Bank it now, claim at launch.">
+      <img src="assets/img/token.png" alt="">
+      <div class="c-body"><b id="grind">0</b><small>$GRIND · banked, claim at launch</small></div>
+    </div>
+    <div class="counter energy" data-help="energy" title="Powers big moves. Refills on its own.">
+      <img src="assets/img/energy.png" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ic-fallback bolt',textContent:'⚡'}))" alt="">
+      <div class="c-body"><b id="energy">12/30</b><div class="ebar" id="energyBar"><i></i></div></div>
+    </div>
+  </div>
+
+  <div class="hud-actions">
+    <button id="walletBtn" class="hbtn wallet">CONNECT WALLET</button>
+    <button id="soundBtn" class="hbtn icon" title="Toggle sound">♪</button>
+  </div>
+</header>
+
+<!-- ===== TICKER ===== -->
+<div class="tickerbar"><div class="ticker-track" id="ticker"></div></div>
+
+<!-- ===== STAGE ===== -->
+<div class="stage">
+
+  <!-- RAIL -->
+  <aside class="rail">
+    <div class="hero-card">
+      <video class="hero-media" id="heroLoop" autoplay muted loop playsinline poster="assets/img/hero.png">
+        <source src="assets/video/hero_loop.mp4" type="video/mp4">
+      </video>
+      <img class="hero-media fallback" src="assets/img/hero.png" alt="">
+      <div class="hero-cap"><span class="live-dot"></span> THE FLOOR IS LIVE</div>
+    </div>
+
+    <div class="ship-box">
+      <div class="ship-head">SHIP IT</div>
+      <button id="shipBtn" class="ship-btn">
+        <span class="ship-label">SHIP IT</span>
+        <span class="ship-sub" id="shipPayout">—</span>
+      </button>
+      <div class="ship-note">Reset the floor → keep a permanent boost + a $GRIND drop. Run it back stronger.</div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><b id="sMult">×1.00</b><span>boost</span></div>
+      <div class="stat"><b id="sPrest">0</b><span>cash-outs</span></div>
+      <div class="stat"><b id="sTier">T0</b><span>top tier</span></div>
+    </div>
+  </aside>
+
+  <!-- PANELS -->
+  <main class="panels">
+
+    <!-- FLOOR -->
+    <section class="panel active" data-panel="floor">
+      <div class="panel-head"><h2>THE FLOOR</h2><p>Drop machines. Junk in, money out.</p></div>
+      <div id="lines" class="lines"></div>
+    </section>
+
+    <!-- BLUEPRINTS -->
+    <section class="panel" data-panel="blueprints">
+      <div class="panel-head"><h2>BLUEPRINTS</h2><p>Spend $GRIND on cards that buff you forever. Odds public, no tricks — and they survive every ship.</p></div>
+      <div class="bp-pull">
+        <img class="bp-pack" src="assets/img/blueprint.png" alt="">
+        <div class="bp-pull-body">
+          <div class="bp-odds" id="bpOdds"></div>
+          <button id="pullBtn" class="cta pull-cta">PULL BLUEPRINT <span id="bpCost">250 $GRIND</span></button>
+          <small class="bp-fine">Published odds. Cards are permanent and stack across every ship.</small>
+        </div>
+      </div>
+      <div id="bpList" class="bp-grid"></div>
+    </section>
+
+    <!-- BANK -->
+    <section class="panel" data-panel="bank">
+      <div class="panel-head"><h2>THE VAULT</h2><p>Your banked $GRIND. Claim it to your wallet at launch.</p></div>
+      <div id="bankPanel" class="bank">
+        <div class="bank-balance">
+          <img src="assets/img/token.png" alt="">
+          <div><b id="bankBalance">0</b><span>$GRIND banked · claim at launch</span></div>
+        </div>
+        <div class="bank-rows">
+          <div class="bank-row"><span>Wallet</span><b id="bankWallet">not connected</b></div>
+          <div class="bank-row"><span>On-chain balance</span><b id="onchainBal">—</b></div>
+          <div class="bank-row"><span>Status</span><b id="bankStatus" class="status">Pre-launch</b></div>
+        </div>
+        <button id="claimBtn" class="cta claim disabled">CLAIM AT LAUNCH</button>
+        <p class="bank-fine">Pre-launch, $GRIND is a claimable balance saved to your wallet. It's a volatile coin — this is a game, not an investment.</p>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="panel" data-panel="ach">
+      <div class="panel-head"><h2>ACHIEVEMENTS <span id="achCount" class="count">0/20</span></h2><p>Hit milestones, get paid in $GRIND — plus a permanent boost.</p></div>
+      <div id="achList" class="ach-grid"></div>
+      <div class="danger-zone"><button id="resetBtn" class="ghost-btn small">WIPE HOUSE</button></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== OBJECTIVE NUDGE BAR (FTUE) ===== -->
+<button id="objective" class="objective" aria-live="polite"></button>
+
+<!-- ===== TAB BAR ===== -->
+<nav class="tabbar">
+  <button class="tab active" data-tab="floor"><span class="ti">▦</span>FLOOR</button>
+  <button class="tab" data-tab="blueprints"><span class="ti">◈</span>BLUEPRINTS</button>
+  <button class="tab" data-tab="bank"><span class="ti">⬢</span>VAULT</button>
+  <button class="tab" data-tab="ach"><span class="ti">★</span>GOALS</button>
+</nav>
+
+<!-- ===== PERSISTENT HELP ===== -->
+<button id="helpBtn" class="help-fab" aria-label="How to play" title="How to play">?</button>
+
+<div id="modalRoot"></div>
+<div id="fxRoot" class="fx-root"></div>
+
+<script type="module" src="js/game.js"></script>
+<script type="module">
+  import { Game } from "./js/game.js";
+  import { LINES } from "./js/data.js";
+  // bank claim button + live stat strip wiring
+  const wire = () => {
+    const cb = document.getElementById("claimBtn");
+    if (cb) cb.addEventListener("click", () => window.GH_claim && window.GH_claim(Game));
+    setInterval(() => {
+      if (!Game.state) return;
+      const s = Game.state;
+      const mult = (1 + 0.02 * (s.prestigeWeight || 0));
+      const sm = document.getElementById("sMult"); if (sm) sm.textContent = "×" + mult.toFixed(2);
+      const sp = document.getElementById("sPrest"); if (sp) sp.textContent = s.totalPrestiges || 0;
+      let deepest = 0; LINES.forEach((L,i)=>{ if (s.lines[L.id]?.copies) deepest = i; });
+      const st = document.getElementById("sTier"); if (st) st.textContent = "T" + deepest;
+    }, 600);
+  };
+  if (document.readyState !== "loading") wire(); else window.addEventListener("DOMContentLoaded", wire);
+</script>
+</body>
+</html>
