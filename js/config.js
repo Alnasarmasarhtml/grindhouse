@@ -79,6 +79,7 @@ export const GH = {
       vestHours: 0,
       perDayTreasuryOutflowCap: 200000,
     },
+    blueprint: { priceSol: 0.1, toBuyback: true }, // Blueprint pull = 0.1 SOL → 100% buyback & burn
     buyback: { pctOfRevenue: 70 }, // activation SOL + cosmetic SOL → buyback&burn
     api: { activate: "/api/activate", nonce: "/api/nonce", accrual: "/api/accrual",
            claim: "/api/claim", spend: "/api/spend", status: "/api/status", price: "/api/price" },

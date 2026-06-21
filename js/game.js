@@ -4,12 +4,13 @@
    UI is driven from here; ui.js never imports this (controls are bound
    by passing `Game` into UI.mount).
    ===================================================================== */
-import { GH } from "./config.js";
+import { GH, isLive } from "./config.js";
 import { LINES, OVERCLOCK, BLUEPRINTS, ACHIEVEMENTS, RARITY_INDEX, BLUEPRINT_COST } from "./data.js";
 import * as Eco from "./economy.js";
 import { load, save, freshState, wipe } from "./save.js";
 import * as UI from "./ui.js";
 import * as Audio from "./audio.js";
+import * as Solana from "./solana.js";
 
 export const Game = {
   state: null,
@@ -152,8 +153,11 @@ export const Game = {
   },
 
   pullBlueprint() {
-    if ((this.state.grind || 0) < BLUEPRINT_COST) { UI.toast(`Need ${BLUEPRINT_COST} $GRIND`); Audio.play("err"); return; }
-    this.state.grind -= BLUEPRINT_COST;
+    // Blueprints are a SOL sink → 100% buyback & burn. Live: pay 0.1 SOL, then roll. Demo: free roll.
+    if (isLive()) { Solana.payBlueprint(this).then(r => { if (r && r.ok && !r.demo) this._rollBlueprint(); }); return; }
+    this._rollBlueprint();
+  },
+  _rollBlueprint() {
     const res = Eco.rollBlueprint();
     this.state.blueprints[res.card.id] = (this.state.blueprints[res.card.id] || 0) + 1;
     this.state.stats.totalPulls = (this.state.stats.totalPulls || 0) + 1;

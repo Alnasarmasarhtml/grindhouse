@@ -82,6 +82,27 @@ export async function payActivation(game, tierId = "operator") {
   } catch (e) { console.warn("[grindhouse] activation failed", e); openActivateAtLaunch(tier); return { ok: false, reason: String(e) }; }
 }
 
+/* ---------- Blueprint pull paid in SOL → 100% buyback & burn (live only) ---------- */
+export async function payBlueprint(game) {
+  const price = GH.chain.blueprint?.priceSol ?? 0.1;
+  if (!isLive()) return { ok: true, demo: true };   // demo: free (caller rolls locally)
+  if (!game.state.wallet) { await connect(game); if (!game.state.wallet) return { ok: false }; }
+  try {
+    const web3 = await loadWeb3();
+    const conn = new web3.Connection(GH.token.rpc, "confirmed");
+    const from = new web3.PublicKey(game.state.wallet);
+    const to = new web3.PublicKey(GH.token.treasury);   // buyback pool
+    const tx = new web3.Transaction().add(web3.SystemProgram.transfer({
+      fromPubkey: from, toPubkey: to, lamports: Math.round(price * web3.LAMPORTS_PER_SOL),
+    }));
+    tx.feePayer = from; tx.recentBlockhash = (await conn.getLatestBlockhash()).blockhash;
+    const signed = await provider.signTransaction(tx);
+    const sig = await conn.sendRawTransaction(signed.serialize());
+    await conn.confirmTransaction(sig, "confirmed");
+    return { ok: true, sig };
+  } catch (e) { console.warn("[grindhouse] blueprint pay failed", e); return { ok: false, reason: String(e) }; }
+}
+
 /* ---------- server-authoritative status (drip/caps/cooldown) ---------- */
 export async function getStatus(pk) {
   if (!isLive()) return null;

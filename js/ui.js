@@ -3,7 +3,7 @@
    Builds machine cards, animates HUD counters, fires modals & particles.
    Receives `game` in mount(); never imports game.js (no circular deps).
    ===================================================================== */
-import { GH } from "./config.js";
+import { GH, isLive } from "./config.js";
 import { LINES, OVERCLOCK, BLUEPRINTS, ACHIEVEMENTS, TICKER, BLUEPRINT_COST } from "./data.js";
 import * as Eco from "./economy.js";
 import { fmt, fmtCash, fmtGrind, fmtRate, fmtTime, shortKey } from "./format.js";
@@ -21,7 +21,7 @@ export function mount(game) {
   // global controls
   $("#shipBtn")?.addEventListener("click", () => G.shipIt());
   $("#pullBtn")?.addEventListener("click", () => G.pullBlueprint());
-  $("#soundBtn")?.addEventListener("click", (e) => { const on = G.toggleSound(); e.currentTarget.classList.toggle("on", on); e.currentTarget.textContent = on ? "♪ SOUND ON" : "♪ SOUND OFF"; });
+  $("#soundBtn")?.addEventListener("click", (e) => { const on = G.toggleSound(); const b = e.currentTarget; b.classList.toggle("on", on); b.textContent = on ? "♪" : "♪̶"; b.title = on ? "Sound on" : "Sound off"; });
   $("#walletBtn")?.addEventListener("click", () => Solana.connect(G));
   $("#resetBtn")?.addEventListener("click", () => { if (confirm("Wipe this House and start over? This cannot be undone.")) G.hardReset(); });
   // tabs
@@ -109,8 +109,8 @@ function card(L, i, state, flows) {
         <button class="btn mini" data-line="${L.id}" data-q="10">×10</button>
         <button class="btn mini" data-line="${L.id}" data-q="max">MAX</button>
       </div>
-      <button class="btn oc" data-line="${L.id}"><span class="lbl">OVERCLOCK</span><span class="oc-lvl" id="oc-${L.id}">Lv ${ls.overclock}</span><span class="cost" id="occost-${L.id}"></span></button>
-      <button class="btn mg" data-line="${L.id}">MERGE 3 → 1× T${i + 1}</button>
+      <button class="btn oc" data-line="${L.id}"><span class="lbl">OVERCLOCK</span><span class="oc-lvl" id="oc-${L.id}">Lv ${ls.overclock}</span><span class="cost" id="occost-${L.id}"></span><i class="hlp" data-help="overclock" title="What's this?">?</i></button>
+      <button class="btn mg" data-line="${L.id}">MERGE 3 → 1× T${i + 1}<i class="hlp" data-help="merge" title="What's this?">?</i></button>
     </div>
     ${unlocked ? "" : `<div class="lock"><div class="lock-i">🔒</div><div>LOCKED · own <b>${L.unlockPrev} ${LINES[i - 1]?.machine || ""}</b> to open</div></div>`}
   `;
@@ -165,7 +165,7 @@ export function refreshCardStates(state, flows) {
 /* ---------------- BLUEPRINTS PANEL ---------------- */
 export function renderBlueprints(state) {
   const root = $("#bpList"); if (!root) return;
-  setText("#bpCost", `${BLUEPRINT_COST} $GRIND`);
+  setText("#bpCost", isLive() ? `${GH.chain.blueprint?.priceSol ?? 0.1} SOL` : "FREE · DEMO");
   // odds table
   const odds = $("#bpOdds");
   if (odds && !odds.dataset.built) {
@@ -479,10 +479,13 @@ function openHelp() {
 
 // ---- I-4 · tap-to-learn glossary popovers (wired to [data-help]) ----
 function wireGlossary() {
-  document.querySelectorAll("[data-help]").forEach(elm => {
-    elm.style.cursor = "help";
-    elm.addEventListener("click", (e) => { e.stopPropagation(); showGloss(elm, elm.dataset.help); });
-  });
+  // delegated + capture so it works on dynamically-rendered cards AND blocks the host button's action
+  document.addEventListener("click", (e) => {
+    const h = e.target.closest && e.target.closest("[data-help]");
+    if (!h) return;
+    e.stopPropagation(); e.preventDefault();
+    showGloss(h, h.dataset.help);
+  }, true);
 }
 function showGloss(anchor, key) {
   document.querySelector(".gloss-pop")?.remove();
