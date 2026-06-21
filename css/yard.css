@@ -51,10 +51,18 @@
 .bldg{ position:absolute; z-index:var(--z); cursor:pointer; will-change:transform; transition:transform .12s }
 .bldg::after{ content:""; position:absolute; left:0; bottom:0; width:96px; height:30px; transform:translate(-50%,-50%);
   background:radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%); pointer-events:none }
-.bldg-art{ position:absolute; left:0; bottom:0; width:108px; transform:translate(-50%,2px);
-  filter:grayscale(.7) brightness(.62); transition:filter .35s, transform .12s; -webkit-user-drag:none }
+.bldg-art{ position:absolute; left:0; bottom:0; width:150px; max-width:none; transform-origin:50% 100%;
+  transform:translate(-50%,2px) scale(var(--st,1));
+  filter:grayscale(.7) brightness(.6); transition:filter .35s, transform .14s; -webkit-user-drag:none }
 .bldg.placed .bldg-art{ filter:none }
-.bldg:hover .bldg-art{ transform:translate(-50%,-2px) }
+.bldg:hover .bldg-art{ transform:translate(-50%,-2px) scale(calc(var(--st,1)*1.02)) }
+/* evolution stages: the building visibly grows as it levels up */
+.bldg.stage-0{ --st:.9 } .bldg.stage-1{ --st:1.06 } .bldg.stage-2{ --st:1.24 } .bldg.stage-3{ --st:1.5 }
+.bldg.evolving .bldg-art{ animation:evolvePop .5s cubic-bezier(.2,.9,.3,1.2) }
+@keyframes evolvePop{
+  0%{ transform:translate(-50%,2px) scale(calc(var(--st,1)*.84)); filter:brightness(1.6) }
+  55%{ transform:translate(-50%,-3px) scale(calc(var(--st,1)*1.1)); filter:brightness(1.2) }
+  100%{ transform:translate(-50%,2px) scale(var(--st,1)); filter:none } }
 .bldg:active{ transform:scale(.97) }
 .bldg-pill{ position:absolute; left:0; bottom:108px; transform:translateX(-50%); white-space:nowrap;
   font-size:.6rem; letter-spacing:.06em; color:var(--gold-hi); background:rgba(8,7,10,.85);
@@ -62,7 +70,7 @@
 .bldg-rate{ position:absolute; left:0; bottom:94px; transform:translateX(-50%); white-space:nowrap;
   font-size:.56rem; color:var(--live); opacity:.9 }
 .bldg-lock{ position:absolute; left:0; bottom:34px; transform:translate(-50%,0); font-size:1.1rem; opacity:.55; display:none }
-.bldg.locked .bldg-art{ filter:grayscale(1) brightness(.32) }
+.bldg.locked .bldg-art{ filter:grayscale(.9) brightness(.55) }
 .bldg.locked .bldg-lock{ display:block }
 .bldg.locked .bldg-rate{ display:none }
 /* "tap me" ready ring when an upgrade is affordable */

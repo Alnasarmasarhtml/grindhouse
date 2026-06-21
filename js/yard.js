@@ -9,6 +9,10 @@ import { LINES, OVERCLOCK } from "./data.js";
 import { GH } from "./config.js";
 import * as Eco from "./economy.js";
 import { fmtCash, fmtRate } from "./format.js";
+import { artSrc, stageClass, stageFor, STAGE_NAME } from "./evolution.js";
+import * as UI from "./ui.js";
+
+const _stage = {};   // last-seen evolution stage per building (to fire the level-up beat)
 
 let G = null, mounted = false, built = false;
 let activeView = "list";
@@ -64,16 +68,19 @@ export function renderYard(state, flows, game) {
   LINES.forEach((L, i) => {
     const [c, r] = LAYOUT[L.id];
     const p = toScreen(c, r);
-    const b = el("div", "bldg");
+    const cp = state.lines[L.id]?.copies || 0;
+    const b = el("div", "bldg " + stageClass(cp));
     b.id = `bldg-${L.id}`; b.dataset.line = L.id; b.dataset.tier = i;
     b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(c, r));
     b.innerHTML = `
       <span class="ready-ring"></span>
-      <img class="bldg-art" src="${L.icon}" alt="${L.machine}" draggable="false" loading="lazy">
+      <img class="bldg-art" src="${artSrc(L.id, cp)}" alt="${L.machine}" draggable="false" loading="lazy"
+           onerror="this.onerror=null;this.src='${L.icon}'">
       <span class="bldg-lock">🔒</span>
       <span class="bldg-pill mono"></span>
       <span class="bldg-rate mono"></span>`;
     bld.appendChild(b);
+    _stage[L.id] = stageFor(cp);
   });
   built = true;
 }
@@ -88,6 +95,14 @@ export function refreshYard(state, flows) {
     const placed = (ls.copies || 0) > 0;
     b.classList.toggle("locked", !unlocked);
     b.classList.toggle("placed", placed);
+    // visual evolution: swap art tier + stage class on threshold cross, fire the level-up beat
+    const st = stageFor(ls.copies);
+    if (_stage[L.id] !== st) {
+      const from = _stage[L.id] ?? st; _stage[L.id] = st;
+      const img = b.querySelector(".bldg-art"); if (img) img.src = artSrc(L.id, ls.copies);
+      b.classList.remove("stage-0", "stage-1", "stage-2", "stage-3"); b.classList.add("stage-" + st);
+      if (placed && st > from) evolveBuilding(L, from, st);
+    }
     // level pill
     const pill = b.querySelector(".bldg-pill");
     if (pill) pill.textContent = placed ? `Lv ${ls.copies}` : (unlocked ? "BUILD" : "");
@@ -103,6 +118,14 @@ export function refreshYard(state, flows) {
     b.classList.toggle("can", canBuy);
   });
   if ($("#inspector")?.classList.contains("open")) renderInspector(); // keep open sheet live
+}
+
+// ---- the "it levels up" beat ----
+function evolveBuilding(L, from, to) {
+  const b = document.getElementById(`bldg-${L.id}`); if (!b) return;
+  b.classList.remove("evolving"); void b.offsetWidth; b.classList.add("evolving");
+  try { UI.mergeBurst(`#bldg-${L.id}`); } catch (_) {}
+  try { UI.toast(`${L.machine} → ${STAGE_NAME[to]} · STAGE ${to + 1}`); } catch (_) {}
 }
 
 // ---- inspector (per-building action sheet) ----

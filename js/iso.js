@@ -6,10 +6,11 @@
 export const TILE_W = 128, TILE_H = 64, GRID = 6;
 export const DIAMOND = "polygon(50% 0,100% 50%,50% 100%,0 50%)";
 
-// origin keeps every plot at positive coords inside #yardCam
-export const ORIGIN_X = 320, ORIGIN_Y = 36;
+// origin keeps every plot at positive coords inside #yardCam; ORIGIN_Y leaves headroom
+// above the back row so tall buildings rise without clipping the top edge.
+export const ORIGIN_X = 320, ORIGIN_Y = 180;
 export const CONTENT_W = ORIGIN_X * 2;                 // 640
-export const CONTENT_H = ORIGIN_Y + GRID * TILE_H + 120; // grid + headroom for tall sprites
+export const CONTENT_H = ORIGIN_Y + GRID * TILE_H + 60; // headroom + grid + bottom margin
 
 // canonical plot map (lineId -> [col,row]); spirals up-and-back, dock at front
 export const LAYOUT = {
