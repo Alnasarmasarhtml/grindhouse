@@ -14,9 +14,9 @@ export function stageFor(copies) {
 }
 export function stageClass(copies) { return "stage-" + stageFor(copies); }
 
-// tiers with the full 4-stage img2img chain (each level grown from the previous render).
-// others use the 2-stage set (s1 base + s4 monument) until their chain is generated.
-const FULL_CHAIN = new Set(["t0"]);
+// every tier has the full 4-stage img2img chain — each level was grown from the
+// previous render so a building reads as the SAME machine leveling up (s1→s4).
+const FULL_CHAIN = new Set(["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"]);
 export function artSrc(lineId, copies) {
   const st = stageFor(copies);
   if (FULL_CHAIN.has(lineId)) return `assets/iso/${lineId}_s${st + 1}.webp`;
