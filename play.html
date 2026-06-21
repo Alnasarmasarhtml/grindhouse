@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,500;125,600;125,700;125,800;125,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/yard.css">
 </head>
 <body class="game-body">
 
@@ -85,8 +86,20 @@
 
     <!-- FLOOR -->
     <section class="panel active" data-panel="floor">
-      <div class="panel-head"><h2>THE FLOOR</h2><p>Drop machines. Junk in, money out.</p></div>
+      <div class="panel-head"><h2 id="floorTitle">THE FLOOR</h2><p id="floorSub">Drop machines. Junk in, money out.</p>
+        <button id="viewToggle" class="ghost-btn small">YARD VIEW</button></div>
+      <div id="yard" class="yard" hidden>
+        <div id="yardCam" class="yard-cam">
+          <div id="yardGround" class="yard-ground"></div>
+          <div id="yardTiles" class="yard-tiles"></div>
+          <svg id="yardLinks" class="yard-links"></svg>
+          <div id="yardBldgs" class="yard-bldgs"></div>
+          <div id="yardFx" class="yard-fx"></div>
+        </div>
+        <button id="yardRecenter" class="ghost-btn small recenter">RECENTER</button>
+      </div>
       <div id="lines" class="lines"></div>
+      <aside id="inspector" class="inspector"></aside>
     </section>
 
     <!-- BLUEPRINTS -->

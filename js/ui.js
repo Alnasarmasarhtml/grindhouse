@@ -139,6 +139,7 @@ export function refreshCardStates(state, flows) {
     cd.classList.toggle("locked", !unlocked);
     cd.classList.toggle("owned", ls.copies > 0);
     if (!unlocked) return;
+    cd.querySelector(".lock")?.remove();   // surgical refresh: drop the lock overlay once unlocked (no full rebuild now)
     const c1 = Eco.bulkCost(L, ls.copies, 1);
     setText(`#cost-${L.id}`, fmtCash(c1));
     setText(`#own-${L.id}`, `×${ls.copies}`);

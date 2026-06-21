@@ -129,6 +129,7 @@ export const GH = {
     showLeaderboard: true,
     showStaking: true,
     soundDefaultOn: false,
+    yardView: true,               // THE YARD isometric base — toggle always available; veterans auto-open it
   },
 
   save: { key: "grindhouse.save.v1", autosaveMs: 5000 },

@@ -11,6 +11,7 @@ import { load, save, freshState, wipe } from "./save.js";
 import * as UI from "./ui.js";
 import * as Audio from "./audio.js";
 import * as Solana from "./solana.js";
+import * as Yard from "./yard.js";
 
 export const Game = {
   state: null,
@@ -25,6 +26,7 @@ export const Game = {
     const now = Date.now();
     const elapsed = (now - (this.state.lastSeen || now)) / 1000;
     UI.mount(this);
+    Yard.mountYard(this);
     if (!this.state.ackRisk) UI.disclaimer(() => { this.state.ackRisk = true; save(this.state, true); UI.initFTUE(this); });
     else UI.initFTUE(this);
     this.recompute();
@@ -37,11 +39,12 @@ export const Game = {
           this.state.runCash += off.cash;
           this.state.lifetimeCash += off.cash;
           Audio.play("collect");
-          this.recompute(); this.renderAll(); save(this.state, true);
+          this.recompute(); this.refresh(); save(this.state, true);
         });
       }
     }
-    this.renderAll();
+    this.renderStructure();
+    Yard.setView(this.state.onboardDone && GH.flags.yardView ? "yard" : "list");
     this._lastTs = performance.now();
     requestAnimationFrame(this.tick.bind(this));
     window.addEventListener("beforeunload", () => save(this.state, true));
@@ -66,7 +69,7 @@ export const Game = {
     // throttled subsystems
     this._acc.ach += dt; this._acc.save += dt; this._acc.render += dt;
     if (this._acc.ach >= 0.7) { this._acc.ach = 0; this.checkAch(); }
-    if (this._acc.render >= 0.25) { this._acc.render = 0; this.recompute(); UI.refreshCardStates(this.state, this.flows); }
+    if (this._acc.render >= 0.25) { this._acc.render = 0; this.refresh(); }
     if (this._acc.save >= GH.save.autosaveMs / 1000) { this._acc.save = 0; save(this.state); }
 
     UI.updateHUD(this.state, this.flows);
@@ -74,7 +77,22 @@ export const Game = {
   },
 
   recompute() { this.flows = Eco.computeFlows(this.state); },
-  renderAll() { this.recompute(); UI.renderLines(this.state, this.flows, this); UI.updateHUD(this.state, this.flows); UI.renderBlueprints(this.state); UI.renderAchievements(this.state); },
+  // build-once: full DOM construction (init, ship reset, blueprint, view switch)
+  renderStructure() {
+    this.recompute();
+    UI.renderLines(this.state, this.flows, this);
+    Yard.renderYard(this.state, this.flows, this);
+    UI.renderBlueprints(this.state);
+    UI.renderAchievements(this.state);
+    UI.updateHUD(this.state, this.flows);
+  },
+  // surgical: per-action + throttled tick — NO innerHTML teardown (keeps the yard alive @60fps)
+  refresh() {
+    this.recompute();
+    UI.refreshCardStates(this.state, this.flows);
+    Yard.refreshYard(this.state, this.flows);
+    UI.updateHUD(this.state, this.flows);
+  },
 
   /* -------- ACTIONS -------- */
   buy(lineId, qty) {
@@ -85,12 +103,12 @@ export const Game = {
     let count = qty;
     if (qty === "max") count = Math.max(1, Eco.affordableCopies(L, ls.copies, this.state.cash));
     const cost = Eco.bulkCost(L, ls.copies, count);
-    if (this.state.cash < cost) { UI.toast("Not enough CASH"); Audio.play("err"); return; }
+    if (this.state.cash < cost - 1e-6) { UI.toast("Not enough CASH"); Audio.play("err"); return; }
     this.state.cash -= cost;
     ls.copies += count;
     Audio.play("buy");
     UI.pulse(`#card-${lineId}`);
-    this.recompute(); this.renderAll(); save(this.state);
+    this.recompute(); this.refresh(); save(this.state);
   },
 
   overclock(lineId) {
@@ -98,12 +116,12 @@ export const Game = {
     const ls = this.state.lines[lineId];
     if (ls.overclock >= OVERCLOCK.maxLevel) { UI.toast("Max overclock"); return; }
     const cost = Eco.overclockCost(L, ls.overclock);
-    if (this.state.cash < cost) { UI.toast("Not enough CASH"); Audio.play("err"); return; }
+    if (this.state.cash < cost - 1e-6) { UI.toast("Not enough CASH"); Audio.play("err"); return; }
     this.state.cash -= cost;
     ls.overclock++;
     Audio.play("upgrade");
     UI.pulse(`#card-${lineId}`);
-    this.recompute(); this.renderAll(); save(this.state);
+    this.recompute(); this.refresh(); save(this.state);
   },
 
   merge(lineId) {
@@ -119,7 +137,7 @@ export const Game = {
     this.state.stats.totalMerges = (this.state.stats.totalMerges || 0) + 1;
     Audio.play("merge");
     UI.mergeBurst(`#card-${LINES[idx + 1].id}`);
-    this.recompute(); this.renderAll(); save(this.state, true);
+    this.recompute(); this.refresh(); save(this.state, true);
   },
 
   shipIt() {
@@ -148,7 +166,7 @@ export const Game = {
       this.state = ns;
       Audio.play("ship");
       UI.shipFlash(payout);
-      this.recompute(); this.renderAll(); save(this.state, true);
+      this.recompute(); this.renderStructure(); save(this.state, true);
     });
   },
 
@@ -163,7 +181,7 @@ export const Game = {
     this.state.stats.totalPulls = (this.state.stats.totalPulls || 0) + 1;
     this.state.stats.bestRarity = Math.max(this.state.stats.bestRarity ?? -1, res.rarityIndex);
     Audio.play(res.rarityIndex >= 3 ? "legendary" : "pull");
-    UI.blueprintResult(res, () => { this.recompute(); this.renderAll(); save(this.state, true); });
+    UI.blueprintResult(res, () => { this.recompute(); this.renderStructure(); save(this.state, true); });
   },
 
   checkAch() {
