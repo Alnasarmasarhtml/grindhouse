@@ -25,10 +25,15 @@ Result: **botting EV ≤ 0 at any token price.** Every farm account must pay a r
 per-epoch **Operator License** (SOL → treasury) *before* it can earn; 70% of that SOL +
 cosmetic revenue buys back & burns. The harder bots farm, the more they pre-pay the treasury.
 
-## The "account tax" (Operator License)
-- Recurring **per-epoch** (1 week), not lifetime. Base `0.05 SOL` (≈$8). Tiers raise the cap
-  proportionally (never a profit lever). Post-liquidity, turn on a burned `feeToken` so the
-  gate cost scales with price. All knobs in `GH.chain.activation` / `GH.chain.earn` / `GH.chain.claim`.
+## The "account tax" (Operator License) — PAID IN $GRIND, BURNED
+- Recurring **per-epoch** (1 week), not lifetime. Cost is denominated in **SOL-value**
+  (`feeSolValue: 0.1`) but **paid in $GRIND** (`payIn:"token"`) and **burned** (`feeTokenBurn:true`).
+  The backend prices it from the oracle each epoch (`$GRIND amount = feeSolValue ÷ token price`),
+  so the $-cost stays stable while the token gets maximum utility: **every player must buy $GRIND
+  to play-to-earn (buy pressure) and the license is burned (deflation).** Tiers raise the cap
+  proportionally (never a profit lever). All knobs in `GH.chain.activation` / `GH.chain.earn` / `GH.chain.claim`.
+- Anti-drain still holds: earnings are value-pegged to ≤ 0.5 × the fee value, so you burn ~0.1 SOL
+  of $GRIND to earn ≤ 0.05 SOL of $GRIND per epoch → net negative for bots, net buy+burn for the token.
 
 ## Token has real in-game value (demand, not just gacha)
 Spend $GRIND on power: Blueprint gacha (exists) + planned Refinery Catalyst / Prestige Ignition /

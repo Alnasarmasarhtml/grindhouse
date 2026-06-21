@@ -47,20 +47,20 @@ export const GH = {
      Gameplay/skill does NOT mint claimable token (client is untrusted).
      This makes botting EV ≤ 0 at any price. See docs/LAUNCH.md. */
   chain: {
-    activation: {                  // the "account tax" — kills free botting
+    activation: {                  // the "account tax" — PAID IN $GRIND (max token utility) — kills free botting
       enabled: true,
       licenseName: "Operator License",
       recurring: true,             // per-epoch, not lifetime
-      feeSol: 0.05,                // ~$8/epoch to treasury
-      feeToken: 0,                 // raise >0 (burned) after liquidity so cost scales with price
-      feeTokenBurn: true,
+      payIn: "token",              // license is bought in $GRIND, NOT SOL → forces buy pressure + a hard sink
+      feeSolValue: 0.1,            // cost/epoch denominated in SOL-VALUE; actual $GRIND = feeSolValue ÷ tokenPriceInSol (server reads oracle)
+      feeTokenBurn: true,          // the license $GRIND is BURNED → deflation; set receiver to send to treasury instead
       tiers: [
-        { id: "operator", feeSol: 0.05, epochCapMult: 1.0, claimCooldownH: 24 },
-        { id: "foreman",  feeSol: 0.25, epochCapMult: 1.8, claimCooldownH: 12 },
-        { id: "kingpin",  feeSol: 1.00, epochCapMult: 3.0, claimCooldownH: 6  },
+        { id: "operator", feeSolValue: 0.1, epochCapMult: 1.0, claimCooldownH: 24 },
+        { id: "foreman",  feeSolValue: 0.5, epochCapMult: 1.8, claimCooldownH: 12 },
+        { id: "kingpin",  feeSolValue: 2.0, epochCapMult: 3.0, claimCooldownH: 6  },
       ],
       refundable: false,
-      receiver: "",                // "" => token.treasury
+      receiver: "",                // "" => burn (feeTokenBurn); else a treasury pubkey
     },
     earn: {
       mode: "time-drip",           // accrual = f(activation_ts, now, tier) — NOT gameplay

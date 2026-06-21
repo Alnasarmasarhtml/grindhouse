@@ -52,36 +52,33 @@ export async function disconnect(game) {
 export const connectWallet = connect; // alias (parallel to GREYMARKET chain.js)
 
 /* ---------- ACTIVATION — the per-epoch Operator License ("account tax") ----------
+   PAID IN $GRIND (≈feeSolValue worth, BURNED) → real token utility + buy pressure.
    DEMO: nothing moves on-chain; honest "opens at launch" modal.
-   LIVE: SystemProgram.transfer(feeSol → treasury) for THIS epoch, then the
-   backend verifies the payment landed before licensing the wallet. */
+   LIVE: the backend prices the license in $GRIND from the oracle (feeSolValue ÷
+   token price) and builds the burn tx; the client only co-signs — it can't forge
+   the amount. Backend licenses the wallet for THIS epoch on confirm. */
 export async function payActivation(game, tierId = "operator") {
   const a = GH.chain.activation;
   const tier = a.tiers.find(t => t.id === tierId) || a.tiers[0];
   if (!isLive()) { openActivateAtLaunch(tier); return { ok: false, reason: "demo" }; }
   if (!game.state.wallet) { await connect(game); if (!game.state.wallet) return { ok: false, reason: "no-wallet" }; }
   try {
-    const web3 = await loadWeb3();
-    const conn = new web3.Connection(GH.token.rpc, "confirmed");
-    const from = new web3.PublicKey(game.state.wallet);
-    const to = new web3.PublicKey(a.receiver || GH.token.treasury);
-    const tx = new web3.Transaction().add(web3.SystemProgram.transfer({
-      fromPubkey: from, toPubkey: to, lamports: Math.round(tier.feeSol * web3.LAMPORTS_PER_SOL),
-    }));
-    tx.feePayer = from; tx.recentBlockhash = (await conn.getLatestBlockhash()).blockhash;
-    const signed = await provider.signTransaction(tx);
-    const sig = await conn.sendRawTransaction(signed.serialize());
-    await conn.confirmTransaction(sig, "confirmed");
-    // backend verifies the transfer landed (amount + payer + epoch) before licensing
     const resp = await fetch(apiBase() + GH.chain.api.activate, {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ wallet: game.state.wallet, sig, tier: tier.id, epoch: currentEpoch() }),
+      body: JSON.stringify({ wallet: game.state.wallet, tier: tier.id, epoch: currentEpoch() }),
     });
-    if (!resp.ok) throw new Error("activation not verified");
+    if (!resp.ok) throw new Error("activation not built");
+    const { txBase64, tokenAmount } = await resp.json();   // server priced + built the $GRIND burn tx
+    const web3 = await loadWeb3();
+    const tx = web3.Transaction.from(Uint8Array.from(atob(txBase64), c => c.charCodeAt(0)));
+    const signed = await provider.signTransaction(tx);
+    const conn = new web3.Connection(GH.token.rpc, "confirmed");
+    const sig = await conn.sendRawTransaction(signed.serialize());
+    await conn.confirmTransaction(sig, "confirmed");   // backend watches confirm + licenses this epoch
     game.state.license = { active: true, tier: tier.id, sig, epoch: currentEpoch(), ts: Date.now() };
     game.state.epochDripStart = Date.now();
     save(game.state, true); refreshWalletUI(game.state);
-    return { ok: true, sig, epoch: currentEpoch() };
+    return { ok: true, sig, tokenAmount, epoch: currentEpoch() };
   } catch (e) { console.warn("[grindhouse] activation failed", e); openActivateAtLaunch(tier); return { ok: false, reason: String(e) }; }
 }
 
@@ -234,8 +231,9 @@ export function openClaimAtLaunch() {
 
 export function openActivateAtLaunch(tier) {
   const a = GH.chain.activation;
+  const fee = tier?.feeSolValue ?? a.feeSolValue;
   simpleModal(`${a.licenseName.toUpperCase()} — OPENS AT LAUNCH`,
-    `At TGE, a per-season <b>${a.licenseName}</b> (${tier?.feeSol ?? a.feeSol} SOL to the house) unlocks <b>real, capped, claimable $GRIND</b> on a weekly drip — and keeps bots from draining the house, because every farming account has to pay the house first. <b>Right now nothing here is real money</b> — it's a free demo.`);
+    `At launch, a per-season <b>${a.licenseName}</b> — bought in <b>$GRIND worth ≈${fee} SOL</b> and <b>burned</b> — unlocks <b>real, capped, claimable $GRIND</b> on a weekly drip. Paying in $GRIND is the whole point: it gives the coin real utility (you buy &amp; burn it to play-to-earn) and it keeps bots out, since every farming account must buy in first. <b>Right now nothing here is real money</b> — it's a free demo.`);
 }
 
 // expose for the bank/license buttons (bound in play.html after import)
