@@ -1,7 +1,8 @@
 /* =====================================================================
-   GRIND HOUSE — THE YARD (isometric base view) · Refinery Brutalist
+   GRIND HOUSE — THE YARD (living map view) · Refinery Brutalist
+   The world is a generated, animated map (refinery platform in space).
+   Machines sit on its real flat slabs, each on its own foundation pad.
    ===================================================================== */
-:root{ --tw:128px; --th:64px; --diamond:polygon(50% 0,100% 50%,50% 100%,0 50%); }
 
 /* ---- always-on centerpiece layout: big YARD + right control column ---- */
 .stage.yard-stage{ grid-template-columns:1fr minmax(322px,384px); align-items:start; }
@@ -10,111 +11,138 @@
 .side .panels{ display:block; }
 .yard-cap{ position:absolute; left:12px; top:12px; z-index:6; display:flex; align-items:center; gap:7px;
   font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; color:var(--bone);
-  background:rgba(7,6,9,.6); padding:4px 9px; box-shadow:inset 0 0 0 1px var(--hair); pointer-events:none; }
+  background:rgba(7,6,9,.55); padding:4px 9px; box-shadow:inset 0 0 0 1px var(--hair); pointer-events:none;
+  backdrop-filter:blur(2px); }
 
-.yard{ position:relative; width:100%; aspect-ratio:4/3; max-height:74vh; min-height:420px; overflow:hidden;
-  background:radial-gradient(130% 95% at 50% 12%, #15131b, #0a0810 62%, #070509 100%); clip-path:var(--cut);
-  box-shadow:inset 0 0 0 1px var(--hair-2); touch-action:none; cursor:grab; }
-/* molten "lava river" frame — flowing gold/orange around the base (neon-as-reward stays; this is the gold accent alive) */
-.yard::before{ content:""; position:absolute; inset:-2px; z-index:-1; clip-path:var(--cut);
-  background:linear-gradient(115deg,#ff6a00,var(--gold-hi),#ff3d00,var(--gold),#ff8c1a); background-size:320% 320%;
-  filter:saturate(1.15) blur(.5px); opacity:.55; animation:lavaflow 9s linear infinite; }
-@keyframes lavaflow{ to{ background-position:320% 0 } }
+/* ---- the viewport ---- */
+.yard{ position:relative; width:100%; aspect-ratio:16/9; max-height:80vh; min-height:360px; overflow:hidden;
+  background:#06060a; clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2); touch-action:none; cursor:grab; }
+.yard:active{ cursor:grabbing; }
+/* edge vignette so machines read against the bright lava */
 .yard::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
-  box-shadow:inset 0 0 70px rgba(245,166,35,.10), inset 0 -40px 80px rgba(0,0,0,.5); clip-path:var(--cut); }
+  box-shadow:inset 0 0 90px rgba(0,0,0,.55), inset 0 -50px 90px rgba(0,0,0,.45); clip-path:var(--cut); }
 
-/* drifting clouds / fog over the yard */
-.yard-sky{ position:absolute; inset:0; z-index:4; overflow:hidden; pointer-events:none; }
-.yard-sky i{ position:absolute; border-radius:50%; background:radial-gradient(ellipse, rgba(180,170,200,.10), transparent 70%);
-  filter:blur(6px); animation:cloudDrift linear infinite; }
-.yard-sky i:nth-child(1){ width:240px; height:90px; top:8%; left:-30%; animation-duration:42s }
-.yard-sky i:nth-child(2){ width:180px; height:70px; top:24%; left:-30%; animation-duration:58s; animation-delay:-20s; opacity:.7 }
-.yard-sky i:nth-child(3){ width:300px; height:110px; top:2%; left:-30%; animation-duration:74s; animation-delay:-46s; opacity:.5 }
-@keyframes cloudDrift{ to{ transform:translateX(180vw) } }
-/* a couple of rising embers (ambient life, capped) */
-.yard-fx::before,.yard-fx::after{ content:""; position:absolute; bottom:18%; width:3px; height:3px; border-radius:50%;
-  background:var(--gold-hi); box-shadow:0 0 6px var(--gold); opacity:0; animation:ember 5.5s ease-in infinite; }
-.yard-fx::before{ left:44% } .yard-fx::after{ left:56%; animation-delay:-2.7s }
-@keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 15%{ opacity:.9 } 100%{ opacity:0; transform:translateY(-120px) } }
-.yard:active{ cursor:grabbing }
-.yard-cam{ position:absolute; inset:0; transform-origin:0 0; will-change:transform }
-.yard-ground{ position:absolute; inset:0; pointer-events:none;
-  background-image:var(--grain); background-size:160px; opacity:.05; mix-blend-mode:overlay }
-.yard-tiles,.yard-bldgs,.yard-fx{ position:absolute; inset:0 }
-.yard-links{ position:absolute; inset:0; overflow:visible; pointer-events:none }
+.yard-cam{ position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform; }
+.yard-bg{ position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover;
+  pointer-events:none; -webkit-user-drag:none; user-select:none; }
+.yard-bldgs,.yard-fx{ position:absolute; inset:0; }
 
-/* diamond plots — the iso grid reads from the hairline gaps */
-.yard-tile{ position:absolute; width:var(--tw); height:var(--th); clip-path:var(--diamond);
-  background:#15141a; transform:scale(.965); transition:background .2s }
+/* a couple of rising embers (ambient life on top of the video, capped) */
+.yard-fx{ pointer-events:none; z-index:3; }
+.yard-fx::before,.yard-fx::after{ content:""; position:absolute; bottom:30%; width:3px; height:3px; border-radius:50%;
+  background:var(--gold-hi); box-shadow:0 0 6px var(--gold); opacity:0; animation:ember 6s ease-in infinite; }
+.yard-fx::before{ left:46% } .yard-fx::after{ left:54%; animation-delay:-3s }
+@keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 18%{ opacity:.85 } 100%{ opacity:0; transform:translateY(-120px) } }
 
-/* a building/sprite — 0-size anchor at the plot center; art rises above */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; will-change:transform; transition:transform .12s }
-.bldg::after{ content:""; position:absolute; left:0; bottom:0; width:96px; height:30px; transform:translate(-50%,-50%);
-  background:radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%); pointer-events:none }
-.bldg-art{ position:absolute; left:0; bottom:0; width:150px; max-width:none; transform-origin:50% 100%;
-  transform:translate(-50%,2px) scale(var(--st,1));
-  filter:grayscale(.7) brightness(.6); transition:filter .35s, transform .14s; -webkit-user-drag:none }
-.bldg.placed .bldg-art{ filter:none }
-.bldg:hover .bldg-art{ transform:translate(-50%,-2px) scale(calc(var(--st,1)*1.02)) }
-/* evolution stages: the building visibly grows as it levels up */
-.bldg.stage-0{ --st:.9 } .bldg.stage-1{ --st:1.06 } .bldg.stage-2{ --st:1.24 } .bldg.stage-3{ --st:1.5 }
-.bldg.evolving .bldg-art{ animation:evolvePop .5s cubic-bezier(.2,.9,.3,1.2) }
+/* ---- a machine: 0-size anchor at the plot (= pad centre); art rises above ---- */
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:112px; --padw:92px; --st:1; }
+.pad-art{ position:absolute; left:0; top:0; width:var(--padw); max-width:none; transform:translate(-50%,-50%);
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.5)); pointer-events:none; -webkit-user-drag:none; transition:filter .3s; }
+.bldg-art{ position:absolute; left:0; top:0; width:var(--bw); max-width:none; transform-origin:50% 100%;
+  transform:translate(-50%, calc(-100% + 18px)) scale(var(--st));
+  filter:drop-shadow(0 10px 16px rgba(0,0,0,.45)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
+.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + 14px)) scale(calc(var(--st)*1.03)); }
+.bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + 18px)) scale(calc(var(--st)*.98)); }
+/* evolution stages: the machine visibly grows as it levels up */
+.bldg.stage-0{ --st:.92 } .bldg.stage-1{ --st:1.06 } .bldg.stage-2{ --st:1.24 } .bldg.stage-3{ --st:1.46 }
+.bldg.evolving .bldg-art{ animation:evolvePop .55s cubic-bezier(.2,.9,.3,1.2); }
 @keyframes evolvePop{
-  0%{ transform:translate(-50%,2px) scale(calc(var(--st,1)*.84)); filter:brightness(1.6) }
-  55%{ transform:translate(-50%,-3px) scale(calc(var(--st,1)*1.1)); filter:brightness(1.2) }
-  100%{ transform:translate(-50%,2px) scale(var(--st,1)); filter:none } }
-.bldg:active{ transform:scale(.97) }
-.bldg-pill{ position:absolute; left:0; bottom:108px; transform:translateX(-50%); white-space:nowrap;
-  font-size:.6rem; letter-spacing:.06em; color:var(--gold-hi); background:rgba(8,7,10,.85);
-  box-shadow:inset 0 0 0 1px var(--hair-2); padding:2px 7px; clip-path:var(--cut-sm) }
-.bldg-rate{ position:absolute; left:0; bottom:94px; transform:translateX(-50%); white-space:nowrap;
-  font-size:.56rem; color:var(--live); opacity:.9 }
-.bldg-lock{ position:absolute; left:0; bottom:34px; transform:translate(-50%,0); font-size:1.1rem; opacity:.55; display:none }
-.bldg.locked .bldg-art{ filter:grayscale(.9) brightness(.55) }
-.bldg.locked .bldg-lock{ display:block }
-.bldg.locked .bldg-rate{ display:none }
-/* "tap me" ready ring when an upgrade is affordable */
-.ready-ring{ position:absolute; left:0; bottom:0; width:74px; height:37px; transform:translate(-50%,-50%);
-  border:1.5px solid var(--gold); clip-path:var(--diamond); opacity:0 }
-.bldg.can:not(.locked) .ready-ring{ opacity:1; animation:yardpulse 1.8s ease-in-out infinite }
-@keyframes yardpulse{ 50%{ opacity:.25 } }
+  0%{ transform:translate(-50%, calc(-100% + 18px)) scale(calc(var(--st)*.82)); filter:brightness(1.7) drop-shadow(0 0 18px var(--gold)) }
+  55%{ transform:translate(-50%, calc(-100% + 8px)) scale(calc(var(--st)*1.1)); filter:brightness(1.25) }
+  100%{ transform:translate(-50%, calc(-100% + 18px)) scale(var(--st)); filter:none } }
+/* locked machines: dim ghost on a cold pad */
+.bldg.locked .bldg-art{ filter:grayscale(.92) brightness(.42); }
+.bldg.locked .pad-art{ filter:grayscale(.7) brightness(.6); }
+.bldg.locked .bldg-lock{ display:block; }
+.bldg.locked .bldg-rate{ display:none; }
 
-/* dock */
-.bldg.dock{ cursor:default }
-.dock-art{ position:absolute; left:0; bottom:0; width:90px; height:46px; transform:translate(-50%,0);
-  background:linear-gradient(180deg,#1b1b20,#101015); clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1px var(--hair-2) }
-.bldg.dock .bldg-pill{ bottom:50px; color:var(--mut) }
+/* labels */
+.bldg-pill{ position:absolute; left:0; top:0; transform:translate(-50%,-186px); white-space:nowrap;
+  font-size:.6rem; letter-spacing:.06em; color:var(--gold-hi); background:rgba(8,7,10,.82);
+  box-shadow:inset 0 0 0 1px var(--hair-2); padding:2px 7px; clip-path:var(--cut-sm); pointer-events:none; }
+.bldg-rate{ position:absolute; left:0; top:0; transform:translate(-50%,-168px); white-space:nowrap;
+  font-size:.56rem; color:var(--live); opacity:.95; text-shadow:0 1px 3px #000; pointer-events:none; }
+.bldg-lock{ position:absolute; left:0; top:0; transform:translate(-50%,-58%); font-size:1.2rem; opacity:.7; display:none; pointer-events:none; }
 
-.recenter{ position:absolute; right:10px; bottom:10px; z-index:5 }
+/* "tap me" ready ring on the pad when an upgrade is affordable */
+.ready-ring{ position:absolute; left:0; top:0; width:calc(var(--padw)*.92); height:calc(var(--padw)*.5);
+  transform:translate(-50%,-50%); border:1.5px solid var(--gold);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%); opacity:0; pointer-events:none; }
+.bldg.can:not(.locked) .ready-ring{ opacity:1; animation:yardpulse 1.7s ease-in-out infinite; }
+@keyframes yardpulse{ 50%{ opacity:.22; } }
 
-/* ---- inspector (right sheet desktop / bottom sheet mobile) ---- */
-.inspector{ position:absolute; right:14px; top:14px; width:280px; z-index:40;
-  background:var(--panel-2); clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2), 0 18px 50px rgba(0,0,0,.5);
-  padding:16px; opacity:0; visibility:hidden; transform:translateY(8px); transition:.22s }
-.inspector.open{ opacity:1; visibility:visible; transform:none }
-.ins-head{ display:flex; align-items:center; gap:11px; margin-bottom:12px }
-.ins-head img{ width:40px; height:40px; object-fit:cover; clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1px var(--hair) }
-.ins-head b{ font-family:var(--disp); font-stretch:125%; font-size:1.05rem; display:block }
-.ins-sub{ font-size:.72rem; color:var(--mut) }.ins-sub b{ color:var(--gold-hi); font-family:var(--mono) }
-.ins-x{ margin-left:auto; color:var(--mut); font-size:1rem; align-self:flex-start }
-.ins-x:hover{ color:var(--warn) }
-.ins-rate{ font-size:1rem; color:var(--live); margin-bottom:12px }
-.ins-actions{ display:grid; gap:7px }
-.ins-actions .cta{ width:100%; justify-content:space-between; padding:.8em 1em }
-.ins-split{ display:grid; grid-template-columns:1fr 1fr; gap:7px }
-.ins-actions .btn{ justify-content:space-between; padding:.65em .9em; clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1.2px var(--hair-2) }
-.ins-actions .btn:hover{ box-shadow:inset 0 0 0 1.2px var(--gold); color:var(--gold-hi) }
-.ins-mg[disabled]{ opacity:.4; pointer-events:none }
-.ins-locked{ font-size:.82rem; color:var(--mut) }.ins-locked b{ color:var(--gold-hi) }
+.recenter{ position:absolute; right:10px; bottom:10px; z-index:6; }
+
+/* ============================ DETAIL MODAL ============================ */
+.ins-scrim{ position:fixed; inset:0; z-index:90; background:rgba(4,3,6,.66);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  opacity:0; visibility:hidden; transition:opacity .2s, visibility .2s; }
+.ins-scrim.open{ opacity:1; visibility:visible; }
+
+.inspector{ position:fixed; left:50%; top:50%; z-index:100; width:min(420px,92vw);
+  background:var(--panel-2); clip-path:var(--cut); overflow:hidden;
+  box-shadow:inset 0 0 0 1px var(--hair-2), 0 30px 80px rgba(0,0,0,.6);
+  opacity:0; visibility:hidden; transform:translate(-50%,-48%) scale(.96);
+  transition:opacity .24s, visibility .24s, transform .24s cubic-bezier(.2,.9,.3,1.2); }
+.inspector.open{ opacity:1; visibility:visible; transform:translate(-50%,-50%) scale(1); }
+
+.ins-x{ position:absolute; right:11px; top:10px; z-index:4; width:27px; height:27px; display:grid; place-items:center;
+  color:var(--bone); font-size:.95rem; background:rgba(6,5,8,.6); box-shadow:inset 0 0 0 1px var(--hair-2);
+  clip-path:var(--cut-sm); cursor:pointer; }
+.ins-x:hover{ color:var(--warn); box-shadow:inset 0 0 0 1px var(--warn); }
+
+.ins-hero{ position:relative; height:198px; display:grid; place-items:center; overflow:hidden;
+  background:radial-gradient(120% 92% at 50% 16%, #16131d, #0a0810 72%); border-bottom:1px solid var(--hair-2); }
+.ins-disc{ position:absolute; bottom:16px; width:210px; height:56px; border-radius:50%;
+  background:radial-gradient(ellipse, rgba(245,166,35,.32), transparent 70%); filter:blur(2px); }
+.ins-hero.stage-3 .ins-disc{ background:radial-gradient(ellipse, rgba(245,166,35,.5), transparent 70%); }
+.ins-mach{ position:relative; z-index:1; max-height:170px; max-width:80%; object-fit:contain;
+  filter:drop-shadow(0 16px 26px rgba(0,0,0,.55)); animation:insFloat 5s ease-in-out infinite; }
+@keyframes insFloat{ 50%{ transform:translateY(-6px); } }
+.ins-hero.locked .ins-mach{ filter:grayscale(.92) brightness(.45); animation:none; }
+.ins-stagebadge{ position:absolute; left:12px; bottom:11px; z-index:2; font-size:.58rem; letter-spacing:.12em;
+  color:var(--gold-hi); background:rgba(8,7,10,.82); box-shadow:inset 0 0 0 1px var(--hair-2);
+  padding:3px 9px; clip-path:var(--cut-sm); }
+.ins-lockbig{ position:absolute; z-index:2; font-size:2.1rem; opacity:.85; }
+
+.ins-body{ padding:15px 16px 16px; }
+.ins-titlerow{ display:flex; align-items:center; gap:10px; }
+.ins-name{ font-family:var(--disp); font-stretch:125%; font-size:1.28rem; line-height:1.05; margin:0; }
+.ins-tier{ margin-left:auto; font-family:var(--mono); font-size:.55rem; letter-spacing:.14em; color:var(--bone);
+  background:rgba(245,166,35,.12); box-shadow:inset 0 0 0 1px var(--hair-2); padding:3px 8px; clip-path:var(--cut-sm); }
+.ins-makes{ font-size:.8rem; color:var(--mut); margin:.45em 0 .95em; }.ins-makes b{ color:var(--bone); }
+.ins-locked{ font-size:.84rem; color:var(--mut); margin:.4em 0 .2em; }.ins-locked b{ color:var(--gold-hi); }
+
+.ins-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:11px; }
+.ins-stat{ background:var(--panel,#0f0f11); clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1px var(--hair); padding:7px 4px; text-align:center; }
+.ins-stat span{ display:block; font-family:var(--mono); font-size:.48rem; letter-spacing:.08em; color:var(--dim); margin-bottom:3px; }
+.ins-stat b{ font-size:.84rem; }.ins-stat b.live{ color:var(--live); }
+
+.ins-stagebar{ position:relative; height:19px; background:var(--panel,#0f0f11); clip-path:var(--cut-sm);
+  box-shadow:inset 0 0 0 1px var(--hair); margin-bottom:13px; overflow:hidden; }
+.ins-stagebar-fill{ position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg,var(--gold),var(--gold-hi)); opacity:.45; }
+.ins-stagebar-cap{ position:absolute; inset:0; display:grid; place-items:center; font-family:var(--mono);
+  font-size:.54rem; letter-spacing:.07em; color:var(--bone); }
+
+.ins-actions{ display:grid; gap:7px; }
+.ins-actions .cta{ width:100%; justify-content:space-between; padding:.82em 1em; }
+.ins-split{ display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.ins-actions .btn{ justify-content:space-between; padding:.66em .9em; clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1.2px var(--hair-2); }
+.ins-actions .btn:hover{ box-shadow:inset 0 0 0 1.2px var(--gold); color:var(--gold-hi); }
+.ins-mg[disabled]{ opacity:.4; pointer-events:none; }
 .ins-actions .hlp{ display:inline-grid; place-items:center; width:14px; height:14px; border-radius:50%; margin-left:6px;
-  font-family:var(--mono); font-size:.56rem; color:var(--dim); box-shadow:inset 0 0 0 1px var(--hair-2); cursor:help }
+  font-family:var(--mono); font-size:.56rem; color:var(--dim); box-shadow:inset 0 0 0 1px var(--hair-2); cursor:help; }
 
+/* ---- mobile: stack + bottom-sheet modal ---- */
 @media (max-width:880px){
   .stage.yard-stage{ grid-template-columns:1fr; }
   .side{ position:static; max-height:none; overflow:visible; }
-  .yard{ aspect-ratio:1/1; max-height:56vh; min-height:340px; }
-  .inspector{ position:fixed; left:0; right:0; bottom:78px; top:auto; width:auto; border-radius:0;
-    transform:translateY(130%); clip-path:var(--cut) }
-  .inspector.open{ transform:none }
+  .yard{ aspect-ratio:4/3; max-height:62vh; min-height:320px; }
+  .inspector{ left:0; right:0; top:auto; bottom:0; width:auto; max-width:none; clip-path:var(--cut);
+    transform:translateY(110%); }
+  .inspector.open{ transform:translateY(0); }
+  .ins-stats{ grid-template-columns:repeat(4,1fr); }
 }
-@media (prefers-reduced-motion:reduce){ .bldg.can .ready-ring{ animation:none } }
+@media (prefers-reduced-motion:reduce){
+  .bldg.can .ready-ring{ animation:none; } .ins-mach{ animation:none; } .yard-fx::before,.yard-fx::after{ animation:none; }
+}

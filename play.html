@@ -60,16 +60,18 @@
     <div class="yard-sky" aria-hidden="true"><i></i><i></i><i></i></div>
     <div id="yard" class="yard">
       <div id="yardCam" class="yard-cam">
-        <div id="yardGround" class="yard-ground"></div>
-        <div id="yardTiles" class="yard-tiles"></div>
-        <svg id="yardLinks" class="yard-links"></svg>
+        <video id="yardBg" class="yard-bg" autoplay loop muted playsinline poster="assets/iso/bg_yard.webp">
+          <source src="assets/iso/yard_loop.webm" type="video/webm">
+          <source src="assets/iso/yard_loop.mp4" type="video/mp4">
+        </video>
         <div id="yardBldgs" class="yard-bldgs"></div>
         <div id="yardFx" class="yard-fx"></div>
       </div>
       <div class="yard-cap"><span class="live-dot"></span> THE YARD · LIVE</div>
       <button id="yardRecenter" class="ghost-btn small recenter">RECENTER</button>
     </div>
-    <aside id="inspector" class="inspector"></aside>
+    <div id="insScrim" class="ins-scrim" aria-hidden="true"></div>
+    <aside id="inspector" class="inspector" role="dialog" aria-modal="true"></aside>
   </div>
 
   <!-- SIDE — controls + the upgrade list -->

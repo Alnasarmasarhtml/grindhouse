@@ -1,31 +1,27 @@
 /* =====================================================================
-   GRIND HOUSE — THE YARD · isometric math (no engine, no bundler)
-   2:1 dimetric diamond grid of upright, pre-projected sprites.
-   The ONLY place grid formulas live.
+   GRIND HOUSE — THE YARD · world coordinates
+   The yard is now a real generated MAP (a refinery platform adrift in
+   space, animated). Machines are placed on the map's actual flat slabs —
+   organic positions, NOT an abstract tile grid. Coordinates are fractions
+   of the 16:9 backdrop so they stay locked to the platform at any zoom.
    ===================================================================== */
-export const TILE_W = 128, TILE_H = 64, GRID = 6;
-export const DIAMOND = "polygon(50% 0,100% 50%,50% 100%,0 50%)";
+export const CONTENT_W = 1600, CONTENT_H = 900;   // matches the 16:9 backdrop/loop
 
-// origin keeps every plot at positive coords inside #yardCam; ORIGIN_Y leaves headroom
-// above the back row so tall buildings rise without clipping the top edge.
-export const ORIGIN_X = 320, ORIGIN_Y = 180;
-export const CONTENT_W = ORIGIN_X * 2;                 // 640
-export const CONTENT_H = ORIGIN_Y + GRID * TILE_H + 60; // headroom + grid + bottom margin
-
-// canonical plot map (lineId -> [col,row]); spirals up-and-back, dock at front
-export const LAYOUT = {
-  t0: [2, 5], t1: [3, 4], t2: [1, 4], t3: [2, 3], t4: [0, 3],
-  t5: [1, 2], t6: [3, 2], t7: [0, 1], t8: [1, 0], dock: [3, 5],
+// organic machine plots — points on the platform's flat top surface, hand-placed
+// to dodge the lava channels and read as a natural isometric base (a spread
+// diamond, front → back). x,y are fractions of the backdrop.
+export const PLOT = {
+  t0: { x: 0.470, y: 0.530 },                       // front
+  t1: { x: 0.580, y: 0.430 }, t2: { x: 0.370, y: 0.450 },
+  t3: { x: 0.660, y: 0.335 }, t4: { x: 0.480, y: 0.360 }, t5: { x: 0.300, y: 0.370 },
+  t6: { x: 0.575, y: 0.260 }, t7: { x: 0.385, y: 0.275 },
+  t8: { x: 0.480, y: 0.185 },                       // back apex (grandest)
 };
+export const PLOTS = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"];
 
-export function toScreen(col, row) {
-  return { x: ORIGIN_X + (col - row) * (TILE_W / 2), y: ORIGIN_Y + (col + row) * (TILE_H / 2) };
+export function toScreen(id) {
+  const p = PLOT[id];
+  return { x: p.x * CONTENT_W, y: p.y * CONTENT_H };
 }
-export function zOf(col, row) { return (col + row) * 10; }
-
-// every plot coord (for building the ground once)
-export function allPlots() {
-  const out = [];
-  for (let r = 0; r < GRID; r++) for (let c = 0; c < GRID; c++) out.push([c, r]);
-  return out;
-}
+// painter z-sort: lower on the map (greater y) draws in front
+export function zOf(id) { return Math.round(PLOT[id].y * 1000); }
