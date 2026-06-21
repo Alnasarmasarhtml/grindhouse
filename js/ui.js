@@ -381,9 +381,9 @@ export function welcomeFTUE() {
   const m = modal(`
     <h2 class="m-title">WELCOME TO THE HOUSE</h2>
     <div class="ftue-rows">
-      <div class="ftue-row"><span class="ftue-ic">▦</span><div><b>BUILD machines.</b><span>They grind junk into money, even offline.</span></div></div>
-      <div class="ftue-row"><span class="ftue-ic">⚙</span><div><b>THEY PRINT.</b><span>24/7, asleep or away. The house never stops.</span></div></div>
-      <div class="ftue-row"><span class="ftue-ic">⬢</span><div><b>BANK $GRIND.</b><span>The real Solana coin. Claim it at launch.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/t0_scrap.png" alt=""></span><div><b>BUILD machines.</b><span>They grind junk into money, even offline.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/cash.png" alt=""></span><div><b>THEY PRINT.</b><span>24/7, asleep or away. The house never stops.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/token.png" alt=""></span><div><b>BANK $GRIND.</b><span>The real Solana coin. Claim it at launch.</span></div></div>
     </div>
     <button class="cta big-cta ftue-go">LET'S GRIND →</button>
     <div class="ftue-foot">Free to play. No wallet to start. <a class="ftue-skip">skip</a></div>
@@ -459,9 +459,9 @@ function openHelp() {
   const m = modal(`
     <h2 class="m-title">HOW TO RUN THE HOUSE</h2>
     <div class="ftue-rows help-loop">
-      <div class="ftue-row"><span class="ftue-ic">▦</span><div><b>BUILD machines.</b><span>They grind junk into money, even offline.</span></div></div>
-      <div class="ftue-row"><span class="ftue-ic">⚙</span><div><b>THEY PRINT.</b><span>24/7, asleep or away.</span></div></div>
-      <div class="ftue-row"><span class="ftue-ic">⬢</span><div><b>BANK $GRIND.</b><span>Claim the real coin at launch.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/t0_scrap.png" alt=""></span><div><b>BUILD machines.</b><span>They grind junk into money, even offline.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/cash.png" alt=""></span><div><b>THEY PRINT.</b><span>24/7, asleep or away.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/token.png" alt=""></span><div><b>BANK $GRIND.</b><span>Claim the real coin at launch.</span></div></div>
     </div>
     <p class="help-one"><b>CASH builds</b> (game money, can't cash out). <b>$GRIND pays</b> (the real coin, claim at launch).</p>
     <div class="help-gloss">${gloss}</div>
