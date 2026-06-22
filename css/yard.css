@@ -41,7 +41,7 @@
 /* ---- a machine: 0-size anchor = the pad's BASE contact point on the deck.
    Each cozy machine sprite carries its OWN matching pad, so the bare pad and the
    machine are both base-anchored here and overlap exactly. ---- */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:212px; --padw:188px; --seat:6px; --st:1; }
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:158px; --padw:138px; --seat:42px; --st:1; }
 /* contact shadow on the deck at the pad base */
 .bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.94); height:calc(var(--padw)*.32);
   transform:translate(-50%,-58%); border-radius:50%;

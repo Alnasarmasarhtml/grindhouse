@@ -14,12 +14,14 @@ export const PLOT = {
   // an isometric diamond lattice mapped onto the clean deck's top plane. Each
   // machine gets its own matching foundation pad (one consistent sprite) placed
   // here, so pad+machine cohere and align. Back row sits inboard → sky headroom.
-  // anchors = each pad's base contact point on the cozy deck's top surface.
-  t0: { x: 0.500, y: 0.640 },                                                        // front
-  t1: { x: 0.360, y: 0.605 }, t2: { x: 0.640, y: 0.605 },
-  t3: { x: 0.300, y: 0.550 }, t4: { x: 0.500, y: 0.550 }, t5: { x: 0.700, y: 0.550 },
-  t6: { x: 0.370, y: 0.495 }, t7: { x: 0.630, y: 0.495 },
-  t8: { x: 0.500, y: 0.460 },                                                        // back (grandest)
+  // a TRUE isometric 3×3 lattice computed on the deck's top-surface diamond
+  // (corners back 50,30 · right 79,47 · front 50,65 · left 21,47), inset with
+  // margin. Front (t0) → back (t8) by depth; reads as a clean grid, not scattered.
+  t0: { x: 0.500, y: 0.565 },                                                        // front
+  t1: { x: 0.419, y: 0.518 }, t2: { x: 0.581, y: 0.518 },
+  t3: { x: 0.338, y: 0.470 }, t4: { x: 0.500, y: 0.470 }, t5: { x: 0.662, y: 0.470 },
+  t6: { x: 0.419, y: 0.422 }, t7: { x: 0.581, y: 0.422 },
+  t8: { x: 0.500, y: 0.375 },                                                        // back (grandest)
 };
 export const PLOTS = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"];
 
