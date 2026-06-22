@@ -164,3 +164,24 @@
 @media (prefers-reduced-motion:reduce){
   .bldg.can .ready-ring{ animation:none; } .ins-mach{ animation:none; } .yard-fx::before,.yard-fx::after{ animation:none; }
 }
+
+/* ===== layout edit mode (play.html?edit=1) — drag machines into place ===== */
+body.yard-edit .yard{ cursor:default; }
+body.yard-edit .bldg{ cursor:grab; }
+body.yard-edit .bldg.dragging{ cursor:grabbing; }
+/* in edit mode show ALL machines (and their baked pad) so every one is positionable */
+body.yard-edit .bldg .bldg-art{ display:block !important; filter:none !important; }
+body.yard-edit .bldg .pad-art{ display:none !important; }
+body.yard-edit .bldg.dragging .bldg-art{ filter:drop-shadow(0 0 14px var(--gold)) !important; }
+body.yard-edit .bldg::after{ content:attr(data-line); position:absolute; left:0; top:0; transform:translate(-50%,6px);
+  font-family:var(--mono); font-size:.6rem; color:#fff; background:rgba(0,0,0,.6); padding:1px 5px; pointer-events:none; }
+.yard-editbar{ position:fixed; left:12px; bottom:12px; z-index:200; width:300px; display:flex; flex-wrap:wrap; gap:8px;
+  align-items:center; padding:12px; background:rgba(10,9,13,.92); box-shadow:inset 0 0 0 1px var(--hair-2);
+  clip-path:var(--cut); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+.yard-editbar b{ font-family:var(--disp); font-stretch:125%; color:var(--gold-hi); font-size:.9rem; }
+.yard-editbar span{ font-size:.66rem; color:var(--mut); flex:1 0 100%; }
+.yard-editbar button{ font-family:var(--mono); font-size:.66rem; letter-spacing:.06em; color:var(--bone); cursor:pointer;
+  background:rgba(245,166,35,.12); box-shadow:inset 0 0 0 1px var(--hair-2); padding:6px 10px; clip-path:var(--cut-sm); }
+.yard-editbar button:hover{ color:var(--gold-hi); box-shadow:inset 0 0 0 1px var(--gold); }
+.yard-editbar textarea{ flex:1 0 100%; height:150px; resize:vertical; font-family:var(--mono); font-size:.6rem; line-height:1.5;
+  color:var(--bone); background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair); border:0; padding:8px; }

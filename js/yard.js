@@ -19,24 +19,105 @@ let cam = { px: 0, py: 0, z: 1 };
 const $ = (s, r = document) => r.querySelector(s);
 const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
 
+// ----- layout edit mode (drag machines into place) — open play.html?edit=1 -----
+const EDIT = new URLSearchParams(location.search).has("edit");
+const LAYOUT_KEY = "grindhouse.yard.layout";
+let editing = null, editOff = { x: 0, y: 0 }, didDrag = false;
+
 export function isYardActive() { return true; }
 export function getBuildingEl(lineId) { return document.getElementById(`bldg-${lineId}`); }
+
+// apply a saved manual layout (fractions) over the defaults, if present
+function loadLayout() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
+    if (saved) for (const id in saved) if (PLOT[id]) { PLOT[id].x = saved[id].x; PLOT[id].y = saved[id].y; }
+  } catch (_) {}
+}
+function saveLayout() {
+  const out = {}; for (const id of PLOTS) out[id] = { x: PLOT[id].x, y: PLOT[id].y };
+  try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(out)); } catch (_) {}
+  updateReadout();
+}
+function layoutJSON() {
+  const lines = PLOTS.map(id => `  ${id}: { x: ${PLOT[id].x.toFixed(4)}, y: ${PLOT[id].y.toFixed(4)} },`);
+  return "export const PLOT = {\n" + lines.join("\n") + "\n};";
+}
+function worldFromEvent(e) {
+  const r = $("#yard").getBoundingClientRect();
+  return { x: (e.clientX - r.left - cam.px) / cam.z, y: (e.clientY - r.top - cam.py) / cam.z };
+}
+function placeBldg(id) {
+  const b = document.getElementById(`bldg-${id}`); if (!b) return;
+  const p = toScreen(id); b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(id));
+}
 
 export function mountYard(game) {
   G = game;
   const yard = $("#yard"); if (!yard) return;
   mounted = true;
+  loadLayout();
   $("#yardRecenter")?.addEventListener("click", () => fitToViewport());
-  // delegated tap on a machine → detail modal
+  // delegated tap on a machine → detail modal (suppressed right after a drag)
   $("#yardBldgs")?.addEventListener("click", (e) => {
     const b = e.target.closest(".bldg"); if (!b) return;
+    if (EDIT || didDrag) { didDrag = false; return; }
     openInspector(b.dataset.line);
   });
   $("#insScrim")?.addEventListener("click", closeInspector);
   bindPan(yard);
+  if (EDIT) enableEdit(yard);
   setHudOffset();
   window.addEventListener("resize", () => { setHudOffset(); fitToViewport(); });
 }
+
+// ----- drag-to-position editor -----
+function enableEdit(yard) {
+  document.body.classList.add("yard-edit");
+  $("#yardBldgs")?.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest(".bldg"); if (!b) return;
+    e.stopPropagation(); e.preventDefault();
+    editing = b.dataset.line; didDrag = false;
+    const w = worldFromEvent(e), p = toScreen(editing);
+    editOff = { x: p.x - w.x, y: p.y - w.y };
+    b.classList.add("dragging");
+    try { b.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!editing) return;
+    didDrag = true;
+    const w = worldFromEvent(e);
+    let fx = (w.x + editOff.x) / CONTENT_W, fy = (w.y + editOff.y) / CONTENT_H;
+    PLOT[editing].x = Math.max(0, Math.min(1, +fx.toFixed(4)));
+    PLOT[editing].y = Math.max(0, Math.min(1, +fy.toFixed(4)));
+    placeBldg(editing);
+  });
+  window.addEventListener("pointerup", () => {
+    if (!editing) return;
+    document.getElementById(`bldg-${editing}`)?.classList.remove("dragging");
+    saveLayout(); editing = null;
+  });
+  buildEditUI();
+}
+
+function buildEditUI() {
+  const bar = el("div", "yard-editbar");
+  bar.innerHTML = `
+    <b>YARD EDIT</b><span>drag machines · auto-saves</span>
+    <button id="edCopy">COPY LAYOUT</button>
+    <button id="edReset">RESET</button>
+    <textarea id="edOut" readonly spellcheck="false"></textarea>`;
+  document.body.appendChild(bar);
+  $("#edCopy").addEventListener("click", async () => {
+    const t = layoutJSON();
+    try { await navigator.clipboard.writeText(t); $("#edCopy").textContent = "COPIED ✓"; setTimeout(() => $("#edCopy").textContent = "COPY LAYOUT", 1200); } catch (_) {}
+  });
+  $("#edReset").addEventListener("click", () => {
+    try { localStorage.removeItem(LAYOUT_KEY); } catch (_) {} location.reload();
+  });
+  updateReadout();
+}
+function updateReadout() { const o = $("#edOut"); if (o) o.value = layoutJSON(); }
 
 // measure the sticky HUD + ticker so the map pins exactly beneath them
 function setHudOffset() {
