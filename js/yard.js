@@ -213,7 +213,7 @@ function renderInspector() {
 // ---- camera: fit + pan, clamped so it never goes tiny or absurdly close ----
 // default framing centers on the PLATFORM (not the empty void) so the base is
 // always the prominent subject — this is the floor for zoom-out.
-const FOCUS = { x0: 0.06, x1: 0.94, y0: 0.14, y1: 0.80 };
+const FOCUS = { x0: 0.08, x1: 0.92, y0: 0.10, y1: 0.82 };
 const Z_MAX = 2.0;
 let zFit = 1;
 export function fitToViewport() {

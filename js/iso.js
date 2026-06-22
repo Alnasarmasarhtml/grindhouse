@@ -14,11 +14,12 @@ export const PLOT = {
   // an isometric diamond lattice mapped onto the clean deck's top plane. Each
   // machine gets its own matching foundation pad (one consistent sprite) placed
   // here, so pad+machine cohere and align. Back row sits inboard → sky headroom.
-  t0: { x: 0.480, y: 0.630 },                                                        // front
-  t1: { x: 0.385, y: 0.585 }, t2: { x: 0.575, y: 0.585 },
-  t3: { x: 0.290, y: 0.535 }, t4: { x: 0.480, y: 0.535 }, t5: { x: 0.670, y: 0.535 },
-  t6: { x: 0.385, y: 0.485 }, t7: { x: 0.575, y: 0.485 },
-  t8: { x: 0.480, y: 0.440 },                                                        // back (grandest)
+  // anchors = each pad's base contact point on the cozy deck's top surface.
+  t0: { x: 0.500, y: 0.640 },                                                        // front
+  t1: { x: 0.360, y: 0.605 }, t2: { x: 0.640, y: 0.605 },
+  t3: { x: 0.300, y: 0.550 }, t4: { x: 0.500, y: 0.550 }, t5: { x: 0.700, y: 0.550 },
+  t6: { x: 0.370, y: 0.495 }, t7: { x: 0.630, y: 0.495 },
+  t8: { x: 0.500, y: 0.460 },                                                        // back (grandest)
 };
 export const PLOTS = ["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"];
 
