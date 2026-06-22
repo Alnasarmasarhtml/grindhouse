@@ -38,13 +38,17 @@
 .yard-fx::before{ left:46% } .yard-fx::after{ left:54%; animation-delay:-3s }
 @keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 18%{ opacity:.85 } 100%{ opacity:0; transform:translateY(-120px) } }
 
-/* ---- a machine: 0-size anchor at the GROUND point (centre of a baked pad) ---- */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:150px; --padw:120px; --seat:16px; --st:1; }
-/* soft contact shadow — plants the machine on its baked foundation pad */
-.bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.86); height:calc(var(--padw)*.4);
-  transform:translate(-50%,-48%); border-radius:50%;
-  background:radial-gradient(ellipse, rgba(0,0,0,.62), rgba(0,0,0,.28) 55%, transparent 74%);
+/* ---- a machine: 0-size anchor at the GROUND point (centre of its pad) ---- */
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:150px; --padw:144px; --seat:-12px; --st:1; }
+/* soft contact shadow on the deck, under the foundation pad */
+.bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.92); height:calc(var(--padw)*.42);
+  transform:translate(-50%,-34%); border-radius:50%;
+  background:radial-gradient(ellipse, rgba(0,0,0,.6), rgba(0,0,0,.26) 55%, transparent 74%);
   filter:blur(3px); pointer-events:none; }
+/* the foundation pad — one consistent sprite per machine, centred on the anchor */
+.pad-art{ position:absolute; left:0; top:0; width:var(--padw); max-width:none; transform:translate(-50%,-50%);
+  filter:drop-shadow(0 5px 7px rgba(0,0,0,.5)); pointer-events:none; -webkit-user-drag:none; transition:filter .3s; }
+.bldg.locked .pad-art{ filter:grayscale(.6) brightness(.62); }
 .bldg-art{ position:absolute; left:0; top:0; width:var(--bw); max-width:none; transform-origin:50% 100%;
   transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--st));
   filter:drop-shadow(0 6px 7px rgba(0,0,0,.5)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
