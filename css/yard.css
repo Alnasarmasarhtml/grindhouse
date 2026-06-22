@@ -38,15 +38,9 @@
 .yard-fx::before{ left:46% } .yard-fx::after{ left:54%; animation-delay:-3s }
 @keyframes ember{ 0%{ opacity:0; transform:translateY(0) } 18%{ opacity:.85 } 100%{ opacity:0; transform:translateY(-120px) } }
 
-/* ---- a machine: 0-size anchor at the GROUND point; plot+shadow ground it ---- */
-.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:152px; --padw:116px; --seat:18px; --st:1; }
-/* flat plot decal — a diamond footprint painted on the ground (never floats) */
-.bldg-plot{ position:absolute; left:0; top:0; width:var(--padw); height:calc(var(--padw)*.56);
-  transform:translate(-50%,-50%); clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
-  background:linear-gradient(180deg, rgba(34,31,40,.5), rgba(8,7,11,.72));
-  box-shadow:inset 0 0 0 1.5px rgba(245,166,35,.30), inset 0 0 20px rgba(0,0,0,.55);
-  pointer-events:none; transition:box-shadow .3s; }
-/* soft contact shadow — plants the machine on the plot */
+/* ---- a machine: 0-size anchor at the GROUND point (centre of a baked pad) ---- */
+.bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:150px; --padw:120px; --seat:16px; --st:1; }
+/* soft contact shadow — plants the machine on its baked foundation pad */
 .bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.86); height:calc(var(--padw)*.4);
   transform:translate(-50%,-48%); border-radius:50%;
   background:radial-gradient(ellipse, rgba(0,0,0,.62), rgba(0,0,0,.28) 55%, transparent 74%);
@@ -54,8 +48,7 @@
 .bldg-art{ position:absolute; left:0; top:0; width:var(--bw); max-width:none; transform-origin:50% 100%;
   transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--st));
   filter:drop-shadow(0 6px 7px rgba(0,0,0,.5)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
-.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat) - 4px)) scale(calc(var(--st)*1.03)); }
-.bldg:hover .bldg-plot{ box-shadow:inset 0 0 0 1.5px rgba(245,166,35,.6), inset 0 0 20px rgba(0,0,0,.55); }
+.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat) - 4px)) scale(calc(var(--st)*1.03)); filter:drop-shadow(0 6px 7px rgba(0,0,0,.5)) drop-shadow(0 0 10px rgba(245,166,35,.35)); }
 .bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st)*.98)); }
 /* evolution stages: the machine visibly grows as it levels up */
 .bldg.stage-0{ --st:.92 } .bldg.stage-1{ --st:1.06 } .bldg.stage-2{ --st:1.24 } .bldg.stage-3{ --st:1.46 }
@@ -64,10 +57,9 @@
   0%{ transform:translate(-50%, calc(-100% + 18px)) scale(calc(var(--st)*.82)); filter:brightness(1.7) drop-shadow(0 0 18px var(--gold)) }
   55%{ transform:translate(-50%, calc(-100% + 8px)) scale(calc(var(--st)*1.1)); filter:brightness(1.25) }
   100%{ transform:translate(-50%, calc(-100% + 18px)) scale(var(--st)); filter:none } }
-/* locked machines: dim ghost on a cold pad */
+/* locked machines: dim ghost on its (empty) baked pad */
 .bldg.locked .bldg-art{ filter:grayscale(.92) brightness(.42); }
-.bldg.locked .bldg-plot{ box-shadow:inset 0 0 0 1.5px rgba(120,120,130,.22), inset 0 0 20px rgba(0,0,0,.6); opacity:.7; }
-.bldg.locked .bldg-shadow{ opacity:.55; }
+.bldg.locked .bldg-shadow{ opacity:.45; }
 .bldg.locked .bldg-lock{ display:block; }
 .bldg.locked .bldg-rate{ display:none; }
 

@@ -66,7 +66,6 @@ export function renderYard(state, flows, game) {
     b.id = `bldg-${L.id}`; b.dataset.line = L.id; b.dataset.tier = i;
     b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(L.id));
     b.innerHTML = `
-      <span class="bldg-plot"></span>
       <span class="ready-ring"></span>
       <span class="bldg-shadow"></span>
       <img class="bldg-art" src="${artSrc(L.id, cp)}" alt="${L.machine}" draggable="false" loading="lazy"
@@ -213,7 +212,7 @@ function renderInspector() {
 // ---- camera: fit + pan, clamped so it never goes tiny or absurdly close ----
 // default framing centers on the PLATFORM (not the empty void) so the base is
 // always the prominent subject — this is the floor for zoom-out.
-const FOCUS = { x0: 0.15, x1: 0.85, y0: 0.05, y1: 0.98 };
+const FOCUS = { x0: 0.16, x1: 0.84, y0: 0.16, y1: 0.92 };
 const Z_MAX = 2.0;
 let zFit = 1;
 export function fitToViewport() {
