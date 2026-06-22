@@ -56,7 +56,7 @@ export function mountYard(game) {
   G = game;
   const yard = $("#yard"); if (!yard) return;
   mounted = true;
-  loadLayout();
+  if (EDIT) loadLayout();   // normal play uses the baked layout; edit mode keeps your saved one
   $("#yardRecenter")?.addEventListener("click", () => fitToViewport());
   // delegated tap on a machine → detail modal (suppressed right after a drag)
   $("#yardBldgs")?.addEventListener("click", (e) => {
@@ -294,7 +294,7 @@ function renderInspector() {
 // ---- camera: fit + pan, clamped so it never goes tiny or absurdly close ----
 // default framing centers on the PLATFORM (not the empty void) so the base is
 // always the prominent subject — this is the floor for zoom-out.
-const FOCUS = { x0: 0.08, x1: 0.92, y0: 0.10, y1: 0.82 };
+const FOCUS = { x0: 0.06, x1: 0.94, y0: 0.06, y1: 0.92 };
 const Z_MAX = 2.0;
 let zFit = 1;
 export function fitToViewport() {
