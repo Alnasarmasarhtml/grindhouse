@@ -31,3 +31,5 @@ export function toScreen(id) {
 }
 // painter z-sort: lower on the map (greater y) draws in front
 export function zOf(id) { return Math.round(PLOT[id].y * 1000); }
+// per-machine user scale (set by scroll in edit mode, baked into PLOT.s); default 1
+export function scaleOf(id) { const s = PLOT[id] && PLOT[id].s; return (typeof s === "number" && s > 0) ? s : 1; }

@@ -43,30 +43,30 @@
 .bldg{ position:absolute; z-index:var(--z); cursor:pointer; --bw:166px; --padw:151px; --seat:42px; --st:1; }
 /* contact shadow on the deck at the pad base */
 .bldg-shadow{ position:absolute; left:0; top:0; width:calc(var(--padw)*.94); height:calc(var(--padw)*.32);
-  transform:translate(-50%,-58%); border-radius:50%;
+  transform:translate(-50%,-58%) scale(var(--us,1)); border-radius:50%;
   background:radial-gradient(ellipse, rgba(0,0,0,.5), rgba(0,0,0,.2) 55%, transparent 74%);
   filter:blur(4px); pointer-events:none; }
 /* bare foundation pad — marks EMPTY plots; built machines carry their own pad */
 .pad-art{ position:absolute; left:0; top:0; width:var(--padw); max-width:none; transform-origin:50% 100%;
-  transform:translate(-50%, calc(-100% + var(--seat))); filter:drop-shadow(0 5px 7px rgba(0,0,0,.5));
+  transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--us,1)); filter:drop-shadow(0 5px 7px rgba(0,0,0,.5));
   pointer-events:none; -webkit-user-drag:none; transition:filter .3s; }
 .bldg.locked .pad-art{ filter:grayscale(.5) brightness(.6); }
 /* the machine (its matching pad is baked in) */
 .bldg-art{ position:absolute; left:0; top:0; width:var(--bw); max-width:none; transform-origin:50% 100%;
-  transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--st));
+  transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st) * var(--us,1)));
   filter:drop-shadow(0 7px 9px rgba(0,0,0,.5)); transition:filter .35s, transform .14s; -webkit-user-drag:none; }
 /* every machine sprite carries the SAME baked platform; bare pad marks only EMPTY plots */
 .bldg.placed .pad-art{ display:none; }
 .bldg:not(.placed) .bldg-art{ display:none; }
-.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat) - 5px)) scale(calc(var(--st)*1.03)); filter:drop-shadow(0 7px 9px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(245,166,35,.4)); }
-.bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st)*.97)); }
+.bldg:hover .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat) - 5px)) scale(calc(var(--st) * var(--us,1) * 1.03)); filter:drop-shadow(0 7px 9px rgba(0,0,0,.5)) drop-shadow(0 0 12px rgba(245,166,35,.4)); }
+.bldg:active .bldg-art{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st) * var(--us,1) * .97)); }
 /* evolution stages: visibly grows as it levels up (modest — the pad is baked in) */
 .bldg.stage-0,.bldg.stage-1,.bldg.stage-2,.bldg.stage-3{ --st:1 }  /* growth is baked into the art; platform must NOT scale per stage */
 .bldg.evolving .bldg-art{ animation:evolvePop .55s cubic-bezier(.2,.9,.3,1.2); }
 @keyframes evolvePop{
-  0%{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st)*.9)); filter:brightness(1.6) drop-shadow(0 0 18px var(--gold)) }
-  55%{ transform:translate(-50%, calc(-100% + var(--seat) - 8px)) scale(calc(var(--st)*1.05)); filter:brightness(1.2) }
-  100%{ transform:translate(-50%, calc(-100% + var(--seat))) scale(var(--st)); filter:none } }
+  0%{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st) * var(--us,1) * .9)); filter:brightness(1.6) drop-shadow(0 0 18px var(--gold)) }
+  55%{ transform:translate(-50%, calc(-100% + var(--seat) - 8px)) scale(calc(var(--st) * var(--us,1) * 1.05)); filter:brightness(1.2) }
+  100%{ transform:translate(-50%, calc(-100% + var(--seat))) scale(calc(var(--st) * var(--us,1))); filter:none } }
 /* locked machines */
 .bldg.locked .bldg-shadow{ opacity:.4; }
 .bldg.locked .bldg-lock{ display:block; }

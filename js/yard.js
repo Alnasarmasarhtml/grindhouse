@@ -5,7 +5,7 @@
    pad; tapping one opens a premium detail modal (image + stats + upgrades).
    Built once (renderYard) then mutated surgically (refreshYard).
    ===================================================================== */
-import { CONTENT_W, CONTENT_H, PLOT, PLOTS, toScreen, zOf } from "./iso.js";
+import { CONTENT_W, CONTENT_H, PLOT, PLOTS, toScreen, zOf, scaleOf } from "./iso.js";
 import { LINES, OVERCLOCK } from "./data.js";
 import { GH } from "./config.js";
 import * as Eco from "./economy.js";
@@ -31,16 +31,16 @@ export function getBuildingEl(lineId) { return document.getElementById(`bldg-${l
 function loadLayout() {
   try {
     const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "null");
-    if (saved) for (const id in saved) if (PLOT[id]) { PLOT[id].x = saved[id].x; PLOT[id].y = saved[id].y; }
+    if (saved) for (const id in saved) if (PLOT[id]) { PLOT[id].x = saved[id].x; PLOT[id].y = saved[id].y; if (typeof saved[id].s === "number") PLOT[id].s = saved[id].s; }
   } catch (_) {}
 }
 function saveLayout() {
-  const out = {}; for (const id of PLOTS) out[id] = { x: PLOT[id].x, y: PLOT[id].y };
+  const out = {}; for (const id of PLOTS) out[id] = { x: PLOT[id].x, y: PLOT[id].y, s: scaleOf(id) };
   try { localStorage.setItem(LAYOUT_KEY, JSON.stringify(out)); } catch (_) {}
   updateReadout();
 }
 function layoutJSON() {
-  const lines = PLOTS.map(id => `  ${id}: { x: ${PLOT[id].x.toFixed(4)}, y: ${PLOT[id].y.toFixed(4)} },`);
+  const lines = PLOTS.map(id => `  ${id}: { x: ${PLOT[id].x.toFixed(4)}, y: ${PLOT[id].y.toFixed(4)}, s: ${scaleOf(id).toFixed(3)} },`);
   return "export const PLOT = {\n" + lines.join("\n") + "\n};";
 }
 function worldFromEvent(e) {
@@ -49,7 +49,7 @@ function worldFromEvent(e) {
 }
 function placeBldg(id) {
   const b = document.getElementById(`bldg-${id}`); if (!b) return;
-  const p = toScreen(id); b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(id));
+  const p = toScreen(id); b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(id)); b.style.setProperty("--us", scaleOf(id));
 }
 
 export function mountYard(game) {
@@ -97,13 +97,23 @@ function enableEdit(yard) {
     document.getElementById(`bldg-${editing}`)?.classList.remove("dragging");
     saveLayout(); editing = null;
   });
+  // scroll over a machine to resize it (bigger / smaller), per-machine, auto-saved
+  $("#yardBldgs")?.addEventListener("wheel", (e) => {
+    const b = e.target.closest(".bldg"); if (!b) return;
+    e.preventDefault();
+    const id = b.dataset.line;
+    const f = e.deltaY < 0 ? 1.06 : 1 / 1.06;
+    PLOT[id].s = Math.max(0.4, Math.min(2.8, +(scaleOf(id) * f).toFixed(3)));
+    b.style.setProperty("--us", PLOT[id].s);
+    saveLayout();
+  }, { passive: false });
   buildEditUI();
 }
 
 function buildEditUI() {
   const bar = el("div", "yard-editbar");
   bar.innerHTML = `
-    <b>YARD EDIT</b><span>drag machines · auto-saves</span>
+    <b>YARD EDIT</b><span>drag to move · scroll over a machine to resize · auto-saves</span>
     <button id="edCopy">COPY LAYOUT</button>
     <button id="edReset">RESET</button>
     <textarea id="edOut" readonly spellcheck="false"></textarea>`;
@@ -145,7 +155,7 @@ export function renderYard(state, flows, game) {
     const cp = state.lines[L.id]?.copies || 0;
     const b = el("div", "bldg " + stageClass(cp));
     b.id = `bldg-${L.id}`; b.dataset.line = L.id; b.dataset.tier = i;
-    b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(L.id));
+    b.style.left = p.x + "px"; b.style.top = p.y + "px"; b.style.setProperty("--z", zOf(L.id)); b.style.setProperty("--us", scaleOf(L.id));
     b.innerHTML = `
       <span class="bldg-shadow"></span>
       <img class="pad-art" src="assets/iso/pad.webp" alt="" draggable="false" loading="lazy">
