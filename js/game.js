@@ -58,7 +58,8 @@ export const Game = {
     let dt = (ts - this._lastTs) / 1000;
     this._lastTs = ts;
     if (dt > 1) dt = 1;               // clamp big stalls (offline handled separately)
-    const inc = this.flows.income * Rewards.activeBoostMult(this.state);
+    const odMult = (this.state.overdriveUntil > Date.now()) ? GH.economy.overdrive.mult : 1;
+    const inc = this.flows.income * Rewards.activeBoostMult(this.state) * odMult;
     if (inc > 0) {
       const gain = inc * dt;
       this.state.cash += gain;
@@ -100,6 +101,21 @@ export const Game = {
     UI.updateHUD(this.state, this.flows);
   },
   saveNow() { save(this.state, true); },
+
+  // OVERDRIVE — spend energy for a short ×N CASH burst (the "juice for big moves")
+  overdrive() {
+    const od = GH.economy.overdrive;
+    if (!od.enabled) return;
+    if (this.state.overdriveUntil > Date.now()) { UI.toast(`Overdrive ×${od.mult} already running`); return; }
+    if ((this.state.energy ?? 0) < od.energyCost) { UI.toast(`Need ${od.energyCost} energy`); Audio.play("err"); return; }
+    this.state.energy = Math.max(0, (this.state.energy ?? 0) - od.energyCost);
+    this.state.energyTs = Date.now();
+    this.state.overdriveUntil = Date.now() + od.seconds * 1000;
+    Audio.play("ship");
+    UI.toast(`⚡ OVERDRIVE ×${od.mult} for ${od.seconds}s!`);
+    this.refresh(); save(this.state, true);
+  },
+  overdriveLeftMs() { return Math.max(0, (this.state.overdriveUntil || 0) - Date.now()); },
 
   /* -------- ACTIONS -------- */
   buy(lineId, qty) {

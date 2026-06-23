@@ -30,6 +30,7 @@ export function freshState() {
     achievements: {},      // id -> true
     energy: GH.economy.energy.base,
     energyTs: now,
+    overdriveUntil: 0,     // OVERDRIVE active until this ts (×N CASH burst)
     staking: { locked: 0, until: 0 },
     stats: { totalMerges: 0, totalPulls: 0, bestRarity: -1 },
     settings: { sound: GH.flags.soundDefaultOn },

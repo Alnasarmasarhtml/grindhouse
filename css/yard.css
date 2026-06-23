@@ -90,6 +90,19 @@
 
 .recenter{ position:absolute; right:10px; bottom:10px; z-index:6; }
 
+/* OVERDRIVE — the "big move": tap to spend energy for a ×N CASH burst */
+.overdrive-fab{ position:absolute; left:10px; bottom:10px; z-index:7; display:flex; align-items:center; gap:6px;
+  font-family:var(--disp); font-stretch:115%; font-weight:800; font-size:.74rem; letter-spacing:.05em; color:#0a090e;
+  background:linear-gradient(180deg,var(--gold-hi),var(--gold)); padding:9px 13px; clip-path:var(--cut-sm); cursor:pointer;
+  box-shadow:0 4px 14px rgba(245,166,35,.4); transition:filter .15s, box-shadow .15s; }
+.overdrive-fab .od-bolt{ font-size:.95rem; line-height:1; }
+.overdrive-fab.ready{ animation:odpulse 1.4s ease-in-out infinite; }
+@keyframes odpulse{ 50%{ box-shadow:0 4px 24px rgba(245,166,35,.85); transform:translateY(-1px); } }
+.overdrive-fab.cant{ filter:grayscale(.7) brightness(.62); cursor:default; box-shadow:none; }
+.overdrive-fab.active{ background:linear-gradient(180deg,#fff1c4,var(--gold-hi)); animation:odactive .6s ease-in-out infinite; }
+@keyframes odactive{ 50%{ box-shadow:0 0 28px rgba(255,210,90,.95); } }
+#cashRate.boosted{ color:var(--gold-hi); font-weight:800; }
+
 /* ============================ DETAIL MODAL ============================ */
 .ins-scrim{ position:fixed; inset:0; z-index:90; background:rgba(4,3,6,.66);
   -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
@@ -127,7 +140,16 @@
 .ins-name{ font-family:var(--disp); font-stretch:125%; font-size:1.28rem; line-height:1.05; margin:0; }
 .ins-tier{ margin-left:auto; font-family:var(--mono); font-size:.55rem; letter-spacing:.14em; color:var(--bone);
   background:rgba(245,166,35,.12); box-shadow:inset 0 0 0 1px var(--hair-2); padding:3px 8px; clip-path:var(--cut-sm); }
-.ins-makes{ font-size:.8rem; color:var(--mut); margin:.45em 0 .95em; }.ins-makes b{ color:var(--bone); }
+.ins-makes{ font-size:.8rem; color:var(--mut); margin:.45em 0 .7em; }.ins-makes b{ color:var(--bone); }
+/* plain-language status banner (idle / feed it / running) */
+.ins-status{ margin:0 0 12px; padding:9px 11px; font-size:.76rem; line-height:1.45; clip-path:var(--cut-sm); }
+.ins-status b{ color:var(--bone); }
+.ins-status.ok{ background:rgba(110,200,120,.10); box-shadow:inset 0 0 0 1px rgba(110,200,120,.30); color:var(--mut); }
+.ins-status.warn{ background:rgba(245,166,35,.12); box-shadow:inset 0 0 0 1px rgba(245,166,35,.45); color:var(--bone); }
+.ins-status.build{ background:rgba(120,140,200,.10); box-shadow:inset 0 0 0 1px var(--hair-2); color:var(--mut); }
+.ins-feed{ display:block; width:100%; margin-top:8px; font-family:var(--mono); font-size:.64rem; letter-spacing:.04em;
+  color:#0a090e; background:var(--gold-hi); padding:7px 8px; clip-path:var(--cut-sm); cursor:pointer; border:0; }
+.ins-feed:hover{ background:var(--gold); }
 .ins-locked{ font-size:.84rem; color:var(--mut); margin:.4em 0 .2em; }.ins-locked b{ color:var(--gold-hi); }
 
 .ins-stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:11px; }

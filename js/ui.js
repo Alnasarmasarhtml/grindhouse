@@ -23,6 +23,7 @@ export function mount(game) {
   $("#pullBtn")?.addEventListener("click", () => G.pullBlueprint());
   $("#soundBtn")?.addEventListener("click", (e) => { const on = G.toggleSound(); const b = e.currentTarget; b.classList.toggle("on", on); b.textContent = on ? "♪" : "♪̶"; b.title = on ? "Sound on" : "Sound off"; });
   $("#walletBtn")?.addEventListener("click", () => Solana.connect(G));
+  $("#overdriveBtn")?.addEventListener("click", () => G.overdrive());
   $("#resetBtn")?.addEventListener("click", () => { if (confirm("Wipe this House and start over? This cannot be undone.")) G.hardReset(); });
   // tabs
   document.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
@@ -53,12 +54,32 @@ export function updateHUD(state, flows) {
   if (Math.abs(state.cash - disp.cash) < 0.5) disp.cash = state.cash;
   if (Math.abs(state.grind - disp.grind) < 0.01) disp.grind = state.grind;
   setText("#cash", fmtCash(disp.cash));
-  setText("#cashRate", fmtRate(flows.income));
+  // show the BOOSTED rate so OVERDRIVE/Surge are visible
+  const od = GH.economy.overdrive;
+  const odOn = (state.overdriveUntil || 0) > Date.now();
+  const odMult = odOn ? od.mult : 1;
+  setText("#cashRate", fmtRate(flows.income * odMult));
+  const cr = $("#cashRate"); if (cr) cr.classList.toggle("boosted", odOn);
   setText("#grind", fmtGrind(disp.grind));
   // energy
   const e = state.energy ?? 0, em = GH.economy.energy.max;
   setText("#energy", `${Math.floor(e)}/${em}`);
   const eb = $("#energyBar i"); if (eb) eb.style.width = `${(e / em) * 100}%`;
+  // OVERDRIVE button state
+  const ob = $("#overdriveBtn");
+  if (ob) {
+    const left = (state.overdriveUntil || 0) - Date.now();
+    const txt = ob.querySelector(".od-txt");
+    if (left > 0) {
+      ob.classList.add("active"); ob.classList.remove("ready", "cant");
+      if (txt) txt.textContent = `×${od.mult} · ${Math.ceil(left / 1000)}s`;
+    } else {
+      ob.classList.remove("active");
+      const ready = e >= od.energyCost;
+      ob.classList.toggle("ready", ready); ob.classList.toggle("cant", !ready);
+      if (txt) txt.textContent = "OVERDRIVE";
+    }
+  }
   // ship button state
   const ship = $("#shipBtn");
   if (ship) {
@@ -328,7 +349,7 @@ function spark(x, y, color, big = false) {
 const GLOSSARY = {
   cash:      "Game money. Earn it selling, spend it building. Can't be cashed out — that's why it's safe to print forever.",
   grind:     "The real Solana coin. Fixed 1B. Bank now, claim to your wallet at launch.",
-  energy:    "Juice for big moves. Refills on its own over time.",
+  energy:    "Juice for OVERDRIVE. Tap ⚡ OVERDRIVE on the yard to spend it for a ×3 CASH burst. Refills on its own.",
   merge:     "Smash 3 of the same machine into 1 of the next tier. How you climb.",
   shipit:    "Reset the floor for a permanent boost + a $GRIND drop. Not a reset — a power-up.",
   overclock: "Pay CASH to make one machine print faster. Forever.",

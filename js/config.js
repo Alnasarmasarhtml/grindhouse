@@ -101,7 +101,8 @@ export const GH = {
       minRunCashToShip: 2.5e8,    // floor before SHIP IT unlocks
       globalMultPerWeight: 0.02,  // +2% global output per prestige weight
     },
-    energy: { base: 12, regenPerSec: 1 / 6, max: 30 }, // active actions cost energy; idle does not
+    energy: { base: 12, regenPerSec: 1 / 6, max: 30 }, // the "juice" — fuels OVERDRIVE
+    overdrive: { enabled: true, energyCost: 10, mult: 3, seconds: 30 }, // tap to spend energy → ×3 CASH burst
     mergeCount: 3,                // merge N identical -> 1 next tier
     mergeBonus: 1.5,              // permanent line multiplier per merge
     milestones: [10, 25, 50, 100, 200, 300, 500], // copies -> x2 that line

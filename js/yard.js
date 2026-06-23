@@ -248,6 +248,14 @@ function renderInspector() {
   const prevLv = STAGE_LV[st] || 0;
   const stagePct = nextLv ? Math.max(0, Math.min(100, ((cp - prevLv) / (nextLv - prevLv)) * 100)) : 100;
   const stageNote = nextLv ? `Evolves at Lv ${nextLv}` : "Fully evolved";
+  // ---- plain-language status: build / starved+feed / feeding / selling ----
+  const prevL = LINES[i - 1];
+  const starved = G.flows.bottleneck >= 0 && i > G.flows.bottleneck && (G.flows.caps[i] || 0) > 0;
+  let statusHtml;
+  if (cp === 0) statusHtml = `<div class="ins-status build">Not built yet — hit <b>BUILD</b> to activate it.</div>`;
+  else if (starved && prevL) statusHtml = `<div class="ins-status warn">⚠ <b>Starved.</b> Not enough <b>${prevL.product}</b> coming in — upgrade <b>${prevL.machine}</b> to feed it.<button class="ins-feed" data-feed="${prevL.id}">FEED IT → ${prevL.machine}</button></div>`;
+  else if (rate <= 0 && i < LINES.length - 1) statusHtml = `<div class="ins-status ok">Running ✓ — all its output is feeding the <b>${LINES[i + 1].machine}</b>. Build more to sell the surplus.</div>`;
+  else statusHtml = `<div class="ins-status ok">Running ✓ — selling surplus for <b>+${fmtRate(rate)}</b>.</div>`;
 
   ins.innerHTML = `
     <button class="ins-x" aria-label="Close">✕</button>
@@ -260,9 +268,10 @@ function renderInspector() {
     <div class="ins-body">
       <div class="ins-titlerow"><h3 class="ins-name">${L.machine}</h3><span class="ins-tier">TIER ${i + 1}</span></div>
       <p class="ins-makes">Refines <b>${L.product}</b> · <b>Lv ${cp}</b></p>
+      ${statusHtml}
 
       <div class="ins-stats">
-        <div class="ins-stat"><span>OUTPUT</span><b class="live">${rate > 0 ? "+" + fmtRate(rate) : "idle"}</b></div>
+        <div class="ins-stat"><span>OUTPUT</span><b class="live">${rate > 0 ? "+" + fmtRate(rate) : (starved ? "⚠" : "—")}</b></div>
         <div class="ins-stat"><span>LEVEL</span><b>${cp}</b></div>
         <div class="ins-stat"><span>OVERCLOCK</span><b>${ls.overclock || 0}/${OVERCLOCK.maxLevel}</b></div>
         <div class="ins-stat"><span>STAGE</span><b>${st + 1}/4</b></div>
@@ -284,6 +293,7 @@ function renderInspector() {
       </div>
     </div>`;
   ins.querySelector(".ins-x")?.addEventListener("click", closeInspector);
+  ins.querySelector(".ins-feed")?.addEventListener("click", (e) => { openInspector(e.currentTarget.dataset.feed); });
   ins.querySelector(".ins-buy")?.addEventListener("click", () => { G.buy(L.id, 1); });
   ins.querySelector(".ins-buy10")?.addEventListener("click", () => { G.buy(L.id, 10); });
   ins.querySelector(".ins-buymax")?.addEventListener("click", () => { G.buy(L.id, "max"); });
