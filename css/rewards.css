@@ -1,9 +1,12 @@
 /* =====================================================================
    GRIND HOUSE — REWARDS UI (daily login · wheels · surge · vault)
    ===================================================================== */
-.rw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-@media (max-width:880px){ .rw-grid{ grid-template-columns:1fr; } }
-.rw-card{ background:var(--panel,#0f0f11); clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2); padding:16px; }
+/* single stacked column — the rewards panel lives inside the narrow side column,
+   so it is NEVER wide enough for 2 columns. Everything is full-width and min-width:0. */
+.rw-grid{ display:flex; flex-direction:column; gap:14px; min-width:0; }
+.rw-card{ background:var(--panel,#0f0f11); clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2);
+  padding:16px; min-width:0; overflow:hidden; }
+.rw-card>div{ min-width:0; }
 .rw-card h3{ font-family:var(--disp); font-stretch:125%; font-size:1.02rem; letter-spacing:.02em; margin:0 0 12px;
   display:flex; align-items:center; gap:8px; }
 .rw-fine{ font-size:.72rem; color:var(--mut); line-height:1.5; margin:11px 0 0; }
@@ -11,12 +14,13 @@
 .rw-live{ margin-left:auto; font-family:var(--mono); font-size:.56rem; letter-spacing:.14em; color:var(--live); display:flex; align-items:center; gap:5px; }
 
 /* ---- daily login ladder ---- */
-.rw-ladder{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:12px; }
-@media (max-width:520px){ .rw-ladder{ grid-template-columns:repeat(4,1fr); } }
-.rw-day{ background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair); padding:8px 4px; text-align:center; clip-path:var(--cut-sm);
-  display:flex; flex-direction:column; gap:3px; min-height:56px; justify-content:center; }
-.rw-day .rw-d{ font-family:var(--mono); font-size:.56rem; color:var(--dim); letter-spacing:.08em; }
-.rw-day .rw-r{ font-size:.62rem; color:var(--bone); line-height:1.15; }
+.rw-ladder{ display:grid; grid-template-columns:repeat(auto-fit,minmax(48px,1fr)); gap:5px; margin-bottom:12px; }
+.rw-day{ background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair); padding:7px 3px; text-align:center; clip-path:var(--cut-sm);
+  display:flex; flex-direction:column; gap:2px; min-width:0; min-height:54px; justify-content:center; position:relative; }
+.rw-day .rw-d{ font-family:var(--mono); font-size:.52rem; color:var(--dim); letter-spacing:.06em; }
+.rw-day .rw-r{ font-family:var(--disp); font-stretch:115%; font-weight:700; font-size:.74rem; color:var(--bone); line-height:1.05; }
+.rw-day .rw-b{ font-size:.62rem; line-height:1; }                 /* bonus icon (surge/perk) */
+.rw-day.big .rw-r{ color:var(--gold-hi); }
 .rw-day.past{ opacity:.5; }
 .rw-day.past::after{ content:"✓"; color:var(--live); font-size:.7rem; }
 .rw-day.big{ box-shadow:inset 0 0 0 1.4px var(--gold); }
@@ -26,18 +30,18 @@
 .cta.disabled,.btn.disabled,.rw-spin.disabled{ opacity:.45; pointer-events:none; }
 
 /* ---- wheel entry buttons ---- */
-.rw-wheelbtns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.rw-spin{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:.9em .6em; }
+.rw-wheelbtns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; min-width:0; }
+.rw-spin{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:.9em .5em; min-width:0; }
+.rw-spin .lbl,.rw-spin .sub{ white-space:nowrap; }
 .rw-spin .lbl{ font-family:var(--disp); font-stretch:115%; font-weight:800; letter-spacing:.02em; }
 .rw-spin .sub{ font-family:var(--mono); font-size:.6rem; opacity:.8; }
 #rwFree.ready{ box-shadow:inset 0 0 0 1.6px var(--gold-hi), 0 0 18px rgba(245,166,35,.35); animation:rwpulse 1.8s ease-in-out infinite; }
 .rw-spin.paid{ box-shadow:inset 0 0 0 1.2px var(--hair-2); }
 
 /* ---- surge shop ---- */
-.rw-surgegrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
-@media (max-width:520px){ .rw-surgegrid{ grid-template-columns:repeat(2,1fr); } }
+.rw-surgegrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(72px,1fr)); gap:7px; }
 .rw-surgebtn{ background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair-2); clip-path:var(--cut-sm); cursor:pointer;
-  padding:9px 4px; display:flex; flex-direction:column; gap:2px; align-items:center; transition:.15s; }
+  padding:9px 4px; display:flex; flex-direction:column; gap:2px; align-items:center; min-width:0; transition:.15s; }
 .rw-surgebtn b{ font-family:var(--disp); font-stretch:125%; font-size:1.05rem; color:var(--gold-hi); }
 .rw-surgebtn span{ font-family:var(--mono); font-size:.56rem; color:var(--dim); }
 .rw-surgebtn em{ font-size:.58rem; color:var(--bone); font-style:normal; }
@@ -45,9 +49,10 @@
 .rw-surgebtn.cant{ opacity:.5; }
 
 /* ---- vault ticker ---- */
-.rw-vrow{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--hair); font-size:.8rem; color:var(--mut); }
+.rw-vrow{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--hair); font-size:.78rem; color:var(--mut); }
 .rw-vrow:last-of-type{ border-bottom:0; }
-.rw-vrow b{ color:var(--bone); }
+.rw-vrow span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rw-vrow b{ color:var(--bone); flex:0 0 auto; white-space:nowrap; }
 .rw-vrow b.mono,.rw-vrow .mono{ font-family:var(--mono); }
 
 /* ---- HUD surge badge + tab ready dot ---- */

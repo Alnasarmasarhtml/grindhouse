@@ -7,9 +7,9 @@
 /* ---- full-bleed layout: a HUGE sticky map + a scrolling control column ----
    The map fills the viewport and stays fixed while the machine column scrolls. */
 .stage.yard-stage{ max-width:none; margin:0; padding:0; gap:0;
-  grid-template-columns:1fr clamp(384px,32vw,520px); align-items:start; }
+  grid-template-columns:minmax(0,1fr) clamp(360px,32vw,520px); align-items:start; }
 .yard-wrap{ position:sticky; top:var(--hud-h,90px); height:calc(100vh - var(--hud-h,90px));
-  padding:12px 0 12px 12px; }
+  padding:12px 0 12px 12px; min-width:0; }
 .side{ display:flex; flex-direction:column; gap:14px; min-width:0; padding:16px 16px 100px;
   border-left:1px solid var(--hair); background:linear-gradient(180deg, rgba(12,11,15,.5), transparent 280px); }
 .side .panels{ display:block; }
@@ -152,8 +152,8 @@
 
 /* ---- mobile: stack + bottom-sheet modal ---- */
 @media (max-width:880px){
-  .stage.yard-stage{ grid-template-columns:1fr; }
-  .yard-wrap{ position:static; height:auto; padding:10px 10px 0; }
+  .stage.yard-stage{ grid-template-columns:minmax(0,1fr); }
+  .yard-wrap{ position:static; height:auto; padding:10px 10px 0; min-width:0; }
   .side{ position:static; height:auto; border-left:0; padding:14px 12px 96px; background:none; }
   .yard{ aspect-ratio:4/3; height:auto; max-height:62vh; min-height:320px; }
   .inspector{ left:0; right:0; top:auto; bottom:0; width:auto; max-width:none; clip-path:var(--cut);

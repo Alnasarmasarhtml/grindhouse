@@ -55,12 +55,12 @@ function renderLogin() {
   const wrap = $("#rwLogin"); if (!wrap) return;
   const info = Rewards.loginInfo(G.state);
   const rows = info.ladder.map((r, i) => {
-    const done = !info.claimable && i === info.rung;
     const isNext = info.claimable && i === info.rung;
-    const txt = r.grind != null ? `${r.grind} $GRIND` : "";
-    const extra = r.surge ? ` +${GH.rewards.surge.tiers[r.surge]?.name || "Surge"}` : (r.perk ? ` +${GH.rewards.perks[r.perk]?.name || "Perk"}` : "");
-    return `<div class="rw-day ${isNext ? "next" : ""} ${r.big ? "big" : ""} ${i < info.rung ? "past" : ""}">
-      <span class="rw-d">D${i + 1}</span><span class="rw-r">${txt}${extra}</span></div>`;
+    const num = r.grind != null ? fmt(r.grind) : "";
+    const bon = r.surge ? "⚡" : (r.perk ? "⏩" : "");
+    const bonName = r.surge ? (GH.rewards.surge.tiers[r.surge]?.name || "Surge") : (r.perk ? (GH.rewards.perks[r.perk]?.name || "Perk") : "");
+    return `<div class="rw-day ${isNext ? "next" : ""} ${r.big ? "big" : ""} ${i < info.rung ? "past" : ""}" title="Day ${i + 1}: ${num} $GRIND${bonName ? " + " + bonName : ""}">
+      <span class="rw-d">D${i + 1}</span><span class="rw-r">${num}</span>${bon ? `<span class="rw-b">${bon}</span>` : ""}</div>`;
   }).join("");
   wrap.innerHTML = `<div class="rw-ladder">${rows}</div>
     <button id="rwClaim" class="cta ${info.claimable ? "" : "disabled"}">${info.claimable ? "CLAIM TODAY" : "COME BACK TOMORROW"}</button>`;
