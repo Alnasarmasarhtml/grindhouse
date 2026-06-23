@@ -14,11 +14,10 @@ export function stageFor(copies) {
 }
 export function stageClass(copies) { return "stage-" + stageFor(copies); }
 
-// New cozy machine set: only the s1 base sprite exists per tier for now (the
-// machine still visibly GROWS on evolution via CSS stage scaling). The 4-stage
-// img2img chains will be regenerated in the cozy style next; until then every
-// stage resolves to s1.
-const FULL_CHAIN = new Set([]);
+// Cozy machine set with the FULL 4-stage img2img chain for every tier — each
+// stage grown from the previous render so a machine reads as the SAME cozy
+// machine leveling up (s1→s4), same pad/angle, only bigger/brighter.
+const FULL_CHAIN = new Set(["t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"]);
 export function artSrc(lineId, copies) {
   const st = stageFor(copies);
   if (FULL_CHAIN.has(lineId)) return `assets/iso/${lineId}_s${st + 1}.webp`;
