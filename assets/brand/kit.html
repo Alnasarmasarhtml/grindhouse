@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>GRIND HOUSE — launch kit artboards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --base:#0A0A0B; --panel:#0F0F11; --raise:#1B1B1F;
+  --gold:#F5A623; --gold-hi:#FFCE6A; --gold-deep:#A8701A;
+  --bone:#ECE8DF; --mut:#8C887E; --dim:#5B584F;
+  --live:#5BE38C; --mag:#FF2EC4; --cy:#18E0FF;
+  --disp:'Archivo Expanded',system-ui,sans-serif; --ui:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#17171b;font-family:var(--ui);color:var(--bone);padding:30px;display:flex;flex-direction:column;gap:30px;align-items:flex-start}
+.slide{position:relative;overflow:hidden;background:var(--base);color:var(--bone);flex:none}
+.slide::after{content:"";position:absolute;inset:0;background:var(--grain);background-size:150px 150px;opacity:.05;mix-blend-mode:overlay;pointer-events:none;z-index:40}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.disp{font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.86;letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+.gold{color:var(--gold)}
+.goldgrad{background:linear-gradient(180deg,var(--gold-hi),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kick{font-family:var(--mono);font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--gold)}
+.chip{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:#0a090e;background:linear-gradient(180deg,var(--gold-hi),var(--gold));padding:10px 16px;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);}
+.chip.ghost{color:var(--gold-hi);background:rgba(245,166,35,.10);box-shadow:inset 0 0 0 1px rgba(245,166,35,.5)}
+.hair{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.85}
+.vig{position:absolute;inset:0;box-shadow:inset 0 0 120px rgba(0,0,0,.6),inset 0 -60px 120px rgba(0,0,0,.5);z-index:20;pointer-events:none}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--live);box-shadow:0 0 10px var(--live)}
+
+/* ============ LOGO LOCKUP 1400x460 ============ */
+#logo{width:1400px;height:460px;display:flex;align-items:center;gap:46px;padding:0 90px;
+  background:radial-gradient(120% 130% at 22% 30%,#241803,#0a0a0b 60%)}
+#logo .em{width:300px;height:300px;object-fit:contain;flex:none;filter:drop-shadow(0 12px 34px rgba(245,166,35,.35))}
+#logo .wm{font-size:150px}
+#logo .wm .h{color:var(--gold)} #logo .wm .g{color:var(--bone)}
+#logo .sub{margin-top:16px;font-size:21px;letter-spacing:.30em}
+
+/* ============ AVATAR 400x400 ============ */
+#avatar{width:400px;height:400px;background:radial-gradient(circle at 50% 40%,#2c1d06,#09090b 70%)}
+#avatar .em{position:absolute;inset:6%;width:88%;height:88%;object-fit:contain;z-index:2;filter:drop-shadow(0 8px 22px rgba(0,0,0,.6))}
+#avatar .ring{position:absolute;inset:14px;z-index:3;clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);box-shadow:inset 0 0 0 3px rgba(245,166,35,.55)}
+
+/* ============ X BANNER 1500x500 ============ */
+#banner{width:1500px;height:500px}
+#banner .bg{object-position:75% 50%}
+#banner .scrim{position:absolute;inset:0;z-index:10;background:linear-gradient(90deg,rgba(8,8,10,.97) 0%,rgba(8,8,10,.82) 30%,rgba(8,8,10,.18) 58%,rgba(8,8,10,0) 78%)}
+#banner .in{position:absolute;z-index:30;left:74px;top:50%;transform:translateY(-50%);max-width:780px}
+#banner .wm{font-size:118px}
+#banner .wm .h{color:var(--gold)}
+#banner .tag{margin:18px 0 22px;font-family:var(--mono);font-size:21px;color:var(--bone);letter-spacing:.02em}
+#banner .tag b{color:var(--gold-hi)}
+#banner .row{display:flex;align-items:center;gap:16px}
+#banner .kick{font-size:15px;margin-bottom:14px}
+
+/* ============ POST: ANNOUNCE 1600x900 ============ */
+.post{width:1600px;height:900px}
+#announce .bg{object-position:50% 42%}
+#announce .scrim{position:absolute;inset:0;z-index:10;background:linear-gradient(180deg,rgba(8,8,10,.62) 0%,rgba(8,8,10,0) 30%,rgba(8,8,10,.45) 62%,rgba(8,8,10,.96) 100%)}
+#announce .top{position:absolute;z-index:30;top:54px;left:64px;display:flex;align-items:center;gap:16px}
+#announce .top img{width:64px;height:64px;object-fit:contain}
+#announce .top span{font-family:var(--mono);font-weight:700;letter-spacing:.32em;font-size:18px}
+#announce .btm{position:absolute;z-index:30;left:64px;right:64px;bottom:64px}
+#announce .wm{font-size:108px}
+#announce .wm .h{color:var(--gold)}
+#announce .sub{margin:20px 0 26px;font-family:var(--mono);font-size:25px;color:var(--bone);max-width:1050px;line-height:1.4}
+#announce .row{display:flex;align-items:center;gap:18px}
+
+/* ============ POST: ECONOMY 1600x900 ============ */
+#econ{display:flex}
+#econ .bg{object-position:50% 50%;opacity:.5}
+#econ .scrim{position:absolute;inset:0;z-index:10;background:linear-gradient(90deg,rgba(8,8,10,.97),rgba(8,8,10,.78) 48%,rgba(8,8,10,.30) 100%)}
+#econ .coins{position:absolute;z-index:15;right:-40px;bottom:-30px;width:760px;height:760px;object-fit:contain;filter:drop-shadow(0 20px 50px rgba(0,0,0,.6))}
+#econ .in{position:absolute;z-index:30;left:70px;top:70px;right:60px;bottom:60px;display:flex;flex-direction:column}
+#econ .wm{font-size:96px;margin:10px 0 6px}
+#econ .wm .b{color:var(--gold)}
+#econ ul{list-style:none;margin-top:26px;display:flex;flex-direction:column;gap:18px;max-width:880px}
+#econ li{font-family:var(--mono);font-size:24px;color:var(--bone);line-height:1.32;padding-left:34px;position:relative}
+#econ li::before{content:"▸";position:absolute;left:0;color:var(--gold);font-size:24px}
+#econ li b{color:var(--gold-hi)}
+#econ .foot{margin-top:auto;font-family:var(--mono);font-size:17px;color:var(--mut);letter-spacing:.04em}
+
+/* ============ POST: FOMO 1080x1080 ============ */
+#fomo{width:1080px;height:1080px}
+#fomo .bg{object-position:50% 42%}
+#fomo .scrim{position:absolute;inset:0;z-index:10;background:radial-gradient(120% 90% at 50% 30%,rgba(8,8,10,.15),rgba(8,8,10,.5) 55%,rgba(8,8,10,.97) 88%)}
+#fomo .in{position:absolute;z-index:30;left:0;right:0;bottom:96px;text-align:center;padding:0 70px}
+#fomo .kick{font-size:20px;margin-bottom:22px}
+#fomo .wm{font-size:138px;line-height:.9}
+#fomo .wm .g{color:var(--gold)}
+#fomo .sub{margin-top:26px;font-family:var(--mono);font-size:26px;color:var(--bone)}
+
+/* ============ HOW TO PLAY board 1600x900 ============ */
+#howto{width:1600px;height:900px;background:radial-gradient(130% 120% at 50% 0%,#1a1206,#0a0a0b 62%);padding:62px 64px}
+#howto .hd{display:flex;align-items:baseline;gap:20px;margin-bottom:8px}
+#howto .hd h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:74px;color:var(--bone)}
+#howto .hd h2 .g{color:var(--gold)}
+#howto .hd .k{font-family:var(--mono);font-weight:700;letter-spacing:.3em;color:var(--gold);font-size:16px}
+#howto .grid{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+#howto .card{position:relative;background:linear-gradient(180deg,#141417,#0d0d10);padding:26px 22px 26px;min-height:560px;
+  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);box-shadow:inset 0 0 0 1px rgba(236,232,223,.10)}
+#howto .card .num{font-family:var(--mono);font-weight:700;color:var(--gold);font-size:17px;letter-spacing:.2em}
+#howto .card .mc{height:280px;display:grid;place-items:center;margin:6px 0 14px}
+#howto .card .mc img{max-height:280px;max-width:100%;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.5))}
+#howto .card h3{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:30px;color:var(--bone);margin-bottom:10px}
+#howto .card p{font-family:var(--ui);font-size:18px;line-height:1.42;color:var(--mut)}
+#howto .card p b{color:var(--gold-hi)}
+#howto .card .bar{position:absolute;left:0;bottom:0;height:4px;width:100%;background:linear-gradient(90deg,var(--gold),transparent)}
+
+/* ============ RULES card 1600x900 ============ */
+#rules{width:1600px;height:900px;background:radial-gradient(130% 120% at 50% 0%,#1a1206,#0a0a0b 62%);padding:62px 64px}
+#rules .hd{display:flex;align-items:baseline;gap:20px;margin-bottom:8px}
+#rules .hd h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:74px;color:var(--bone)}
+#rules .hd h2 .g{color:var(--gold)}
+#rules .hd .k{font-family:var(--mono);font-weight:700;letter-spacing:.3em;color:var(--gold);font-size:16px}
+#rules .grid{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+#rules .r{display:flex;gap:20px;align-items:flex-start;background:linear-gradient(180deg,#141417,#0d0d10);padding:26px 28px;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);box-shadow:inset 0 0 0 1px rgba(236,232,223,.10)}
+#rules .r .ic{font-size:42px;line-height:1;flex:none;width:56px;text-align:center}
+#rules .r h3{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:30px;color:var(--gold-hi);margin-bottom:8px}
+#rules .r p{font-family:var(--ui);font-size:19px;line-height:1.42;color:var(--mut)}
+#rules .r p b{color:var(--bone)}
+#rules .foot{position:absolute;left:64px;bottom:30px;font-family:var(--mono);font-size:16px;color:var(--dim);letter-spacing:.04em}
+</style></head>
+<body>
+
+<div class="slide" id="logo" data-name="logo">
+  <img class="em" src="src/emblem.png" alt="">
+  <div><div class="wm disp"><span class="g">GRIND</span><br><span class="h">HOUSE</span></div>
+  <div class="sub mono gold">$GRIND · SOLANA IDLE REFINERY</div></div>
+</div>
+
+<div class="slide" id="avatar" data-name="avatar">
+  <img class="em" src="src/emblem.png" alt=""><div class="ring"></div>
+</div>
+
+<div class="slide" id="banner" data-name="banner_1500x500">
+  <img class="bg" src="src/banner.png" alt=""><div class="scrim"></div><div class="vig"></div>
+  <div class="in">
+    <div class="kick">SOLANA · IDLE REFINERY</div>
+    <div class="wm disp">GRIND<br><span class="h">HOUSE</span></div>
+    <div class="tag">Run the refinery. Grind scrap into <b>$GRIND</b>.</div>
+    <div class="row"><span class="chip"><span style="font-size:13px">◆</span> THE HOUSE NEVER SLEEPS</span>
+      <span class="chip ghost"><span class="dot"></span> FREE DEMO LIVE</span></div>
+  </div>
+  <div class="hair" style="bottom:0"></div>
+</div>
+
+<div class="slide post" id="announce" data-name="post_announce">
+  <img class="bg" src="src/hero.png" alt=""><div class="scrim"></div>
+  <div class="top"><img src="src/emblem.png" alt=""><span class="gold">GRIND HOUSE</span></div>
+  <div class="btm">
+    <div class="kick" style="font-size:17px;margin-bottom:16px">NOW PLAYABLE · FREE DEMO</div>
+    <div class="wm disp">THE IDLE REFINERY<br><span class="h">ON SOLANA</span></div>
+    <div class="sub">Grind scrap → iron → steel → chips → <span class="gold">$GRIND</span>. Nine machines, one platform, the house never sleeps.</div>
+    <div class="row"><span class="chip">PLAY THE FREE DEMO →</span><span class="chip ghost">$GRIND AT LAUNCH</span></div>
+  </div>
+  <div class="hair" style="bottom:0"></div>
+</div>
+
+<div class="slide post" id="econ" data-name="post_economy">
+  <img class="bg" src="src/atmos.png" alt=""><div class="scrim"></div>
+  <img class="coins" src="src/economy.png" alt="">
+  <div class="in">
+    <div class="kick" style="font-size:16px">THE LOOP</div>
+    <div class="wm disp">GRIND. <span class="b">BURN.</span><br>SPLIT. REPEAT.</div>
+    <ul>
+      <li>You win from <b>day one</b> — small daily $GRIND, shown in USD.</li>
+      <li>Spend $GRIND on multipliers &amp; spins → <b>burned + treasury</b>.</li>
+      <li><b>1% of supply</b> split every week across the top 10 grinders.</li>
+      <li>The house recycles every sink <b>back to the players</b>.</li>
+    </ul>
+    <div class="foot">Free demo: practice score now · real, capped $GRIND at launch. A game, not an investment.</div>
+  </div>
+</div>
+
+<div class="slide" id="fomo" data-name="post_fomo_1080">
+  <img class="bg" src="src/smelter_cu.png" alt=""><div class="scrim"></div><div class="vig"></div>
+  <div class="in">
+    <div class="kick">$GRIND · SOLANA</div>
+    <div class="wm disp">THE HOUSE<br><span class="g">NEVER</span><br>SLEEPS</div>
+    <div class="sub">Your refinery grinds 24/7 — even offline.</div>
+  </div>
+</div>
+
+<div class="slide" id="howto" data-name="howto">
+  <div class="hd"><h2 class="disp">HOW TO <span class="g">PLAY</span></h2><span class="k">FOUR MOVES</span></div>
+  <div class="grid">
+    <div class="card"><div class="num">01</div><div class="mc"><img src="../iso/t0_s2.webp"></div><h3>Build</h3><p>Tap a pad and build a machine. It starts <b>grinding scrap</b> on its own.</p><div class="bar"></div></div>
+    <div class="card"><div class="num">02</div><div class="mc"><img src="../iso/t1_s3.webp"></div><h3>Feed</h3><p>Each machine <b>feeds the next</b>. Upgrade upstream so nothing starves.</p><div class="bar"></div></div>
+    <div class="card"><div class="num">03</div><div class="mc"><img src="../iso/t6_s4.webp"></div><h3>Evolve</h3><p>Level a machine and it <b>visibly upgrades</b> — four stages, grander each time.</p><div class="bar"></div></div>
+    <div class="card"><div class="num">04</div><div class="mc"><img src="../iso/t8_s4.webp"></div><h3>Ship</h3><p>Ship the yard for a <b>permanent boost + a $GRIND drop</b>. Run it back stronger.</p><div class="bar"></div></div>
+  </div>
+</div>
+
+<div class="slide" id="rules" data-name="rules">
+  <div class="hd"><h2 class="disp">THE <span class="g">RULES</span></h2><span class="k">HOW YOU WIN $GRIND</span></div>
+  <div class="grid">
+    <div class="r"><div class="ic">⚡</div><div><h3>Overdrive</h3><p>Spend <b>energy</b> for a <b>×3 cash burst</b>. Energy refills on its own — time your big moves.</p></div></div>
+    <div class="r"><div class="ic">◉</div><div><h3>Fortune Wheels</h3><p>A <b>free daily spin</b> ($100 token pot) + a paid wheel for boosts. Paid spins <b>burn $GRIND</b>.</p></div></div>
+    <div class="r"><div class="ic">🏆</div><div><h3>Weekly Top 10</h3><p><b>1% of supply</b> split across the week's top grinders — graded, biggest grind takes the most.</p></div></div>
+    <div class="r"><div class="ic">◈</div><div><h3>Blueprints</h3><p>Pull cards that <b>buff you forever</b> and survive every ship. Published odds, 100% buyback &amp; burn.</p></div></div>
+  </div>
+  <div class="foot">Free demo now — practice $GRIND, not a token. Real, capped $GRIND unlocks at launch.</div>
+</div>
+
+</body></html>
