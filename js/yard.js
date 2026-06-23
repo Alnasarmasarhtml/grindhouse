@@ -65,7 +65,7 @@ export function mountYard(game) {
     openInspector(b.dataset.line);
   });
   $("#insScrim")?.addEventListener("click", closeInspector);
-  bindPan(yard);
+  // camera is FIXED & stable — no wheel-zoom, no drag-pan (keeps the map locked + crisp)
   if (EDIT) enableEdit(yard);
   setHudOffset();
   window.addEventListener("resize", () => { setHudOffset(); fitToViewport(); });
@@ -313,7 +313,7 @@ export function fitToViewport() {
   if (!vw || !vh) { requestAnimationFrame(fitToViewport); return; }
   const fw = (FOCUS.x1 - FOCUS.x0) * CONTENT_W, fh = (FOCUS.y1 - FOCUS.y0) * CONTENT_H;
   zFit = Math.min(vw / fw, vh / fh);                   // frame the platform
-  cam.z = zFit;
+  cam.z = Math.min(zFit, 1);            // never upscale past native → map + sprites stay crisp ("4K") at any size
   const fcx = (FOCUS.x0 + FOCUS.x1) / 2 * CONTENT_W, fcy = (FOCUS.y0 + FOCUS.y1) / 2 * CONTENT_H;
   cam.px = vw / 2 - fcx * cam.z;
   cam.py = vh / 2 - fcy * cam.z;
