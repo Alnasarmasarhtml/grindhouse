@@ -12,6 +12,8 @@ import * as UI from "./ui.js";
 import * as Audio from "./audio.js";
 import * as Solana from "./solana.js";
 import * as Yard from "./yard.js";
+import * as Rewards from "./rewards.js";
+import * as RewardsUI from "./rewardsui.js";
 
 export const Game = {
   state: null,
@@ -27,6 +29,7 @@ export const Game = {
     const elapsed = (now - (this.state.lastSeen || now)) / 1000;
     UI.mount(this);
     Yard.mountYard(this);
+    Rewards.dailyReset(this);
     if (!this.state.ackRisk) UI.disclaimer(() => { this.state.ackRisk = true; save(this.state, true); UI.initFTUE(this); });
     else UI.initFTUE(this);
     this.recompute();
@@ -55,7 +58,7 @@ export const Game = {
     let dt = (ts - this._lastTs) / 1000;
     this._lastTs = ts;
     if (dt > 1) dt = 1;               // clamp big stalls (offline handled separately)
-    const inc = this.flows.income;
+    const inc = this.flows.income * Rewards.activeBoostMult(this.state);
     if (inc > 0) {
       const gain = inc * dt;
       this.state.cash += gain;
@@ -84,15 +87,19 @@ export const Game = {
     Yard.renderYard(this.state, this.flows, this);
     UI.renderBlueprints(this.state);
     UI.renderAchievements(this.state);
+    RewardsUI.mountRewards(this);
     UI.updateHUD(this.state, this.flows);
   },
   // surgical: per-action + throttled tick — NO innerHTML teardown (keeps the yard alive @60fps)
   refresh() {
     this.recompute();
+    Rewards.dailyReset(this);
     UI.refreshCardStates(this.state, this.flows);
     Yard.refreshYard(this.state, this.flows);
+    RewardsUI.refreshRewards(this);
     UI.updateHUD(this.state, this.flows);
   },
+  saveNow() { save(this.state, true); },
 
   /* -------- ACTIONS -------- */
   buy(lineId, qty) {
@@ -157,6 +164,8 @@ export const Game = {
         settings: this.state.settings,
         wallet: this.state.wallet,
         staking: this.state.staking,
+        rewards: this.state.rewards,   // daily login / wheels / surge survive a SHIP IT
+        vault: this.state.vault,
         createdTs: this.state.createdTs,
       };
       const ns = freshState();

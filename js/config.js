@@ -132,8 +132,100 @@ export const GH = {
     yardView: true,               // THE YARD isometric base — toggle always available; veterans auto-open it
   },
 
+  /* ---------------- REWARDS ENGINE (daily login · wheels · surge · vault) ----------------
+     Everything here is a tunable dial — re-balance freely as the game scales (start small:
+     100-200 players, not 5k). In DEMO all payouts are practice-$GRIND (off-chain score, not a
+     token); at launch the same numbers are server-priced off the oracle. The closed-loop
+     accounting (loop.*) mirrors docs/ECONOMY_v2.md so the on-chain split slots in unchanged. */
+  rewards: {
+    resetHourUTC: 0,              // when the daily roll-over happens
+
+    // ----- DAILY LOGIN (separate from the wheel) — a 7-day streak ladder that repeats -----
+    dailyLogin: {
+      enabled: true,
+      softDecay: true,            // miss a day → drop ONE rung (not reset to day 1)
+      ladder: [                   // grind = practice-$GRIND; surge/perk = a granted boost id
+        { grind: 50 },
+        { grind: 80 },
+        { grind: 120, surge: "spark" },
+        { grind: 180 },
+        { grind: 260 },
+        { grind: 360, perk: "speed" },
+        { grind: 600, surge: "overdrive", big: true },
+      ],
+    },
+
+    // ----- FREE FORTUNE WHEEL — 1 spin/day, capped daily pot (your "$100/day") -----
+    freeWheel: {
+      enabled: true,
+      spinsPerDay: 1,
+      dailyPotGrind: 100_000,     // hard cap of practice-$GRIND the FREE wheel can pay out per day across everyone (the "$100 in tokens" cap). Once drained, free spins pay the floor only.
+      floorGrind: 10,             // minimum a spin always pays even if the pot is dry
+      segments: [                 // weighted; prize = grind | surge | perk
+        { label: "10",     grind: 10,   weight: 30 },
+        { label: "25",     grind: 25,   weight: 22 },
+        { label: "50",     grind: 50,   weight: 16 },
+        { label: "×1.5",   surge: "spark", weight: 9 },
+        { label: "100",    grind: 100,  weight: 11 },
+        { label: "250",    grind: 250,  weight: 7 },
+        { label: "SPEED",  perk: "speed", weight: 3 },
+        { label: "1000",   grind: 1000, weight: 2 },
+      ],
+    },
+
+    // ----- PAID FORTUNE WHEEL — pay $GRIND, win PERKS (boosts/speed-ups). Fee → burn+treasury -----
+    paidWheel: {
+      enabled: true,
+      costGrind: 250,             // per spin
+      feeSplit: { burn: 0.5, treasury: 0.5 },   // the spent $GRIND is destroyed/treasuried (demo: vault accounting; live: real burn+buyback)
+      segments: [                 // perks, not withdrawable token (legal keystone) — except a rare jackpot
+        { label: "×1.5 SURGE", surge: "spark",     weight: 24 },
+        { label: "SPEED-UP",   perk: "speed",      weight: 22 },
+        { label: "×2 SURGE",   surge: "overdrive", weight: 16 },
+        { label: "CASH RUSH",  perk: "cash2",      weight: 13 },
+        { label: "×3 SURGE",   surge: "meltdown",  weight: 8 },
+        { label: "BLUEPRINT",  perk: "blueprint",  weight: 8 },
+        { label: "×5 SURGE",   surge: "kingpin",   weight: 3 },
+        { label: "MISS",       perk: "none",       weight: 5 },
+        { label: "5K JACKPOT", grind: 5000,        weight: 1 },
+      ],
+    },
+
+    // ----- SURGE multipliers (also a direct-buy sink) -----
+    surge: {
+      enabled: true,
+      tiers: {
+        spark:     { name: "Spark ×1.5",     mult: 1.5, hours: 24,  costGrind: 150 },
+        overdrive: { name: "Overdrive ×2",   mult: 2.0, hours: 24,  costGrind: 400 },
+        meltdown:  { name: "Meltdown ×3",    mult: 3.0, hours: 72,  costGrind: 1500 },
+        kingpin:   { name: "Kingpin ×5",     mult: 5.0, hours: 168, costGrind: 6000 },
+      },
+    },
+
+    // ----- PERKS (non-multiplier rewards) -----
+    perks: {
+      speed: { name: "Speed-up",  desc: "Instantly bank 1h of grind" , hours: 1 },
+      cash2: { name: "Cash Rush", desc: "×2 CASH for 1h", mult: 2, hours: 1 },
+      blueprint: { name: "Free Blueprint", desc: "One free Blueprint pull" },
+      none:  { name: "So close…", desc: "No prize this time" },
+    },
+
+    // ----- CLOSED LOOP (demo accounting that mirrors the on-chain split at launch) -----
+    loop: {
+      sinkSplit: { dailyDrop: 0.40, top10: 0.15, everybody: 0.10, burn: 0.20, treasury: 0.15 },
+      houseAheadFactor: 0.67,     // a wallet's lifetime claims ≤ 0.67× lifetime net spend (+ founder grant) — anti-drain master rule
+      founderGrantGrind: 5000,    // one-time free-starter allowance per account (the "win from day 1" feel)
+      showTicker: true,           // surface the burn/vault ticker so players SEE the loop
+    },
+  },
+
   save: { key: "grindhouse.save.v1", autosaveMs: 5000 },
 };
+
+// ----- rewards helpers -----
+// a stable "day index" in the configured reset timezone (UTC + resetHourUTC offset)
+export const dayIndex = (now = Date.now()) =>
+  Math.floor((now - GH.rewards.resetHourUTC * 3600000) / 86400000);
 
 // convenience: are we live on-chain yet?
 // HONEST gate: "live" needs the mint AND the backend (api) AND the value-peg oracle.

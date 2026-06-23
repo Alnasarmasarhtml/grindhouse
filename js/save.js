@@ -40,6 +40,17 @@ export function freshState() {
     lifetimeClaimed: 0,
     onboarded: false,      // has seen the welcome/how-to-play card
     onboardDone: false,    // has cleared the full objective-nudge sequence
+    // ----- rewards engine state (daily login · wheels · surge) -----
+    rewards: {
+      lastLoginDay: -1, loginStreak: 0,                 // daily-login ladder
+      freeSpinDay: -1,                                  // dayIndex of last free spin
+      freePotDay: -1, freePotLeft: GH.rewards.freeWheel.dailyPotGrind,  // free-wheel daily pot cap
+      surge: { id: null, mult: 1, until: 0 },           // active output multiplier
+      cashRush: { mult: 1, until: 0 },                  // active temp cash multiplier
+      founderUsed: 0, spentGrind: 0, claimedGrind: 0,   // closed-loop / house-ahead ledger
+    },
+    vault: { day: -1, burnedTotal: 0, burnedToday: 0, treasuryTotal: 0,
+             dropPool: 0, top10Pool: 0, everybodyPool: 0, freePaidToday: 0 },
     createdTs: now,
     lastSeen: now,
   };
@@ -68,6 +79,10 @@ function reconcile(s) {
   merged.settings = { ...base.settings, ...(s.settings || {}) };
   merged.staking = { ...base.staking, ...(s.staking || {}) };
   merged.license = { ...base.license, ...(s.license || {}) };
+  merged.rewards = { ...base.rewards, ...(s.rewards || {}) };
+  merged.rewards.surge = { ...base.rewards.surge, ...(s.rewards?.surge || {}) };
+  merged.rewards.cashRush = { ...base.rewards.cashRush, ...(s.rewards?.cashRush || {}) };
+  merged.vault = { ...base.vault, ...(s.vault || {}) };
   merged.blueprints = s.blueprints || {};
   merged.achievements = s.achievements || {};
   return merged;

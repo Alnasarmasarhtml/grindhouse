@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/game.css">
 <link rel="stylesheet" href="css/yard.css">
+<link rel="stylesheet" href="css/rewards.css">
 </head>
 <body class="game-body">
 
@@ -43,6 +44,7 @@
   </div>
 
   <div class="hud-actions">
+    <span id="surgeBadge" class="surge-badge" style="display:none" title="Active Surge multiplier"></span>
     <span id="chainBadge" class="chain-badge" title="On-chain status">DEMO</span>
     <button id="walletBtn" class="hbtn wallet">CONNECT WALLET</button>
     <button id="soundBtn" class="hbtn icon" title="Toggle sound">♪</button>
@@ -113,6 +115,12 @@
       <div id="bpList" class="bp-grid"></div>
     </section>
 
+    <!-- REWARDS -->
+    <section class="panel" data-panel="rewards">
+      <div class="panel-head"><h2>REWARDS</h2><p>Daily login, the fortune wheels &amp; Surge boosts. Practice $GRIND in the demo (not a token, resets at launch) — real at launch.</p></div>
+      <div id="rewardsPanel"></div>
+    </section>
+
     <!-- BANK -->
     <section class="panel" data-panel="bank">
       <div class="panel-head"><h2>THE VAULT</h2><p>Your demo score. At launch, activated Operators claim a real, capped weekly $GRIND drip.</p></div>
@@ -151,6 +159,7 @@
 <nav class="tabbar">
   <button class="tab active" data-tab="floor"><span class="ti">▦</span>FLOOR</button>
   <button class="tab" data-tab="blueprints"><span class="ti">◈</span>BLUEPRINTS</button>
+  <button class="tab" data-tab="rewards"><span class="ti">◉</span>REWARDS</button>
   <button class="tab" data-tab="bank"><span class="ti">⬢</span>VAULT</button>
   <button class="tab" data-tab="ach"><span class="ti">★</span>GOALS</button>
 </nav>

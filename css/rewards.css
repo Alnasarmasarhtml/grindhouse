@@ -1,0 +1,73 @@
+/* =====================================================================
+   GRIND HOUSE — REWARDS UI (daily login · wheels · surge · vault)
+   ===================================================================== */
+.rw-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:880px){ .rw-grid{ grid-template-columns:1fr; } }
+.rw-card{ background:var(--panel,#0f0f11); clip-path:var(--cut); box-shadow:inset 0 0 0 1px var(--hair-2); padding:16px; }
+.rw-card h3{ font-family:var(--disp); font-stretch:125%; font-size:1.02rem; letter-spacing:.02em; margin:0 0 12px;
+  display:flex; align-items:center; gap:8px; }
+.rw-fine{ font-size:.72rem; color:var(--mut); line-height:1.5; margin:11px 0 0; }
+.rw-fine b{ color:var(--bone); }
+.rw-live{ margin-left:auto; font-family:var(--mono); font-size:.56rem; letter-spacing:.14em; color:var(--live); display:flex; align-items:center; gap:5px; }
+
+/* ---- daily login ladder ---- */
+.rw-ladder{ display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-bottom:12px; }
+@media (max-width:520px){ .rw-ladder{ grid-template-columns:repeat(4,1fr); } }
+.rw-day{ background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair); padding:8px 4px; text-align:center; clip-path:var(--cut-sm);
+  display:flex; flex-direction:column; gap:3px; min-height:56px; justify-content:center; }
+.rw-day .rw-d{ font-family:var(--mono); font-size:.56rem; color:var(--dim); letter-spacing:.08em; }
+.rw-day .rw-r{ font-size:.62rem; color:var(--bone); line-height:1.15; }
+.rw-day.past{ opacity:.5; }
+.rw-day.past::after{ content:"✓"; color:var(--live); font-size:.7rem; }
+.rw-day.big{ box-shadow:inset 0 0 0 1.4px var(--gold); }
+.rw-day.next{ box-shadow:inset 0 0 0 1.6px var(--gold-hi); background:rgba(245,166,35,.10); animation:rwpulse 1.8s ease-in-out infinite; }
+@keyframes rwpulse{ 50%{ box-shadow:inset 0 0 0 1.6px var(--gold-hi), 0 0 16px rgba(245,166,35,.4); } }
+#rwClaim{ width:100%; }
+.cta.disabled,.btn.disabled,.rw-spin.disabled{ opacity:.45; pointer-events:none; }
+
+/* ---- wheel entry buttons ---- */
+.rw-wheelbtns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.rw-spin{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:.9em .6em; }
+.rw-spin .lbl{ font-family:var(--disp); font-stretch:115%; font-weight:800; letter-spacing:.02em; }
+.rw-spin .sub{ font-family:var(--mono); font-size:.6rem; opacity:.8; }
+#rwFree.ready{ box-shadow:inset 0 0 0 1.6px var(--gold-hi), 0 0 18px rgba(245,166,35,.35); animation:rwpulse 1.8s ease-in-out infinite; }
+.rw-spin.paid{ box-shadow:inset 0 0 0 1.2px var(--hair-2); }
+
+/* ---- surge shop ---- */
+.rw-surgegrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+@media (max-width:520px){ .rw-surgegrid{ grid-template-columns:repeat(2,1fr); } }
+.rw-surgebtn{ background:#0b0a0e; box-shadow:inset 0 0 0 1px var(--hair-2); clip-path:var(--cut-sm); cursor:pointer;
+  padding:9px 4px; display:flex; flex-direction:column; gap:2px; align-items:center; transition:.15s; }
+.rw-surgebtn b{ font-family:var(--disp); font-stretch:125%; font-size:1.05rem; color:var(--gold-hi); }
+.rw-surgebtn span{ font-family:var(--mono); font-size:.56rem; color:var(--dim); }
+.rw-surgebtn em{ font-size:.58rem; color:var(--bone); font-style:normal; }
+.rw-surgebtn:hover{ box-shadow:inset 0 0 0 1.4px var(--gold); }
+.rw-surgebtn.cant{ opacity:.5; }
+
+/* ---- vault ticker ---- */
+.rw-vrow{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--hair); font-size:.8rem; color:var(--mut); }
+.rw-vrow:last-of-type{ border-bottom:0; }
+.rw-vrow b{ color:var(--bone); }
+.rw-vrow b.mono,.rw-vrow .mono{ font-family:var(--mono); }
+
+/* ---- HUD surge badge + tab ready dot ---- */
+.surge-badge{ font-family:var(--mono); font-size:.66rem; font-weight:700; color:#0a090e; background:var(--gold-hi);
+  padding:3px 8px; clip-path:var(--cut-sm); letter-spacing:.02em; }
+.tab.has-ready{ position:relative; }
+.tab.has-ready::after{ content:""; position:absolute; top:6px; right:calc(50% - 26px); width:7px; height:7px; border-radius:50%;
+  background:var(--gold-hi); box-shadow:0 0 8px var(--gold-hi); }
+
+/* ============================ WHEEL MODAL ============================ */
+.modal-wrap.wheel .modal{ max-width:380px; text-align:center; }
+.rw-wheelmodal h2.m-title{ margin-bottom:14px; }
+.rw-wheelstage{ position:relative; width:300px; max-width:84vw; margin:0 auto 14px; aspect-ratio:1/1; }
+.rw-wheelsvg{ width:100%; height:100%; display:block; filter:drop-shadow(0 10px 30px rgba(0,0,0,.5)); }
+.rw-rotor{ transform-box:fill-box; transform-origin:50% 50%; }
+.rw-seglabel{ fill:var(--bone,#ece8df); font-family:var(--mono,monospace); font-size:13px; font-weight:700; }
+.rw-hub{ fill:var(--gold-hi,#ffc24b); font-family:var(--disp,sans-serif); font-size:22px; font-weight:900; }
+.rw-pointer{ position:absolute; top:-6px; left:50%; transform:translateX(-50%); color:var(--gold-hi); font-size:1.5rem;
+  text-shadow:0 2px 6px #000; z-index:2; pointer-events:none; }
+.rw-result{ min-height:1.6em; font-size:.95rem; color:var(--mut); margin-bottom:14px; }
+.rw-result .rw-won{ color:var(--gold-hi); font-family:var(--disp); font-stretch:125%; font-size:1.3rem; }
+.rw-go{ width:100%; margin-bottom:8px; }
+.modal-wrap.wheel .rw-close{ width:100%; }
