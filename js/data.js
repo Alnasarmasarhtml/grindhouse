@@ -37,7 +37,7 @@ export const OVERCLOCK = {
 
 // BLUEPRINTS — the $GRIND sink / gacha. Permanent, persist through prestige.
 // Pull odds are PUBLISHED (shown in-game). Effects stack multiplicatively.
-export const BLUEPRINT_COST = 250;   // $GRIND per pull (pre-launch: banked $GRIND)
+export const BLUEPRINT_COST = 2500;   // $GRIND per pull (pre-launch: banked $GRIND)
 export const BLUEPRINTS = {
   rarities: [
     { key: "common",    label: "Common",    color: "#9aa3b2", odds: 0.60 },
@@ -62,26 +62,26 @@ export const BLUEPRINTS = {
 // ACHIEVEMENTS — secretly permanent buffs (reward $GRIND + small global mult).
 // trigger(state) -> bool. Checked each tick; one-time.
 export const ACHIEVEMENTS = [
-  { id: "first_blood", name: "First Blood",        desc: "Place your first machine.",            grind: 5,    mult: 1.00, test: s => s.totalMachines >= 1 },
-  { id: "ten_rigs",    name: "Tooled Up",          desc: "Own 10 machines.",                     grind: 10,   mult: 1.01, test: s => s.totalMachines >= 10 },
-  { id: "millionaire", name: "Millionaire",        desc: "Bank $1,000,000 lifetime.",            grind: 25,   mult: 1.02, test: s => s.lifetimeCash >= 1e6 },
-  { id: "first_link",  name: "Supply Lines",       desc: "Run a 3-tier chain.",                  grind: 15,   mult: 1.01, test: s => s.deepestTier >= 3 },
-  { id: "merge1",      name: "Fusion",             desc: "Perform your first merge.",            grind: 20,   mult: 1.02, test: s => s.totalMerges >= 1 },
-  { id: "chip",        name: "Keystone",           desc: "Unlock the Fab Core (Microchips).",    grind: 40,   mult: 1.03, test: s => s.deepestTier >= 5 },
-  { id: "billionaire", name: "Billionaire",        desc: "Bank $1,000,000,000 lifetime.",        grind: 60,   mult: 1.03, test: s => s.lifetimeCash >= 1e9 },
-  { id: "first_ship",  name: "Ship It",            desc: "Prestige for the first time.",         grind: 50,   mult: 1.05, test: s => s.totalPrestiges >= 1 },
-  { id: "gold",        name: "Now We're Printing", desc: "Unlock the Gold Mint.",                grind: 80,   mult: 1.04, test: s => s.deepestTier >= 6 },
-  { id: "blueprint1",  name: "Blueprinted",        desc: "Open your first blueprint pack.",      grind: 30,   mult: 1.02, test: s => s.totalPulls >= 1 },
-  { id: "legendary",   name: "Heavy Plates",       desc: "Pull a Legendary blueprint.",          grind: 120,  mult: 1.06, test: s => s.bestRarity >= 3 },
-  { id: "refinery",    name: "Pure Product",       desc: "Unlock the Grind Refinery (T8).",      grind: 200,  mult: 1.08, test: s => s.deepestTier >= 8 },
-  { id: "trillion",    name: "Trillionaire",       desc: "Bank $1,000,000,000,000 lifetime.",    grind: 150,  mult: 1.05, test: s => s.lifetimeCash >= 1e12 },
-  { id: "ship5",       name: "Repeat Offender",    desc: "Prestige 5 times.",                    grind: 175,  mult: 1.07, test: s => s.totalPrestiges >= 5 },
-  { id: "hundred",     name: "Floor Boss",         desc: "Own 100 of a single line.",            grind: 100,  mult: 1.05, test: s => s.maxLineCopies >= 100 },
-  { id: "merge10",     name: "Fusion Addict",      desc: "Merge 10 times.",                      grind: 110,  mult: 1.05, test: s => s.totalMerges >= 10 },
-  { id: "mythic",      name: "Singularity",        desc: "Pull a Mythic blueprint.",             grind: 400,  mult: 1.12, test: s => s.bestRarity >= 4 },
-  { id: "googol",      name: "Off The Charts",     desc: "Bank $1e30 lifetime.",                 grind: 300,  mult: 1.08, test: s => s.lifetimeCash >= 1e30 },
-  { id: "ship25",      name: "Kingpin",            desc: "Prestige 25 times.",                   grind: 500,  mult: 1.15, test: s => s.totalPrestiges >= 25 },
-  { id: "whale",       name: "House Always Wins",  desc: "Bank 100,000 $GRIND lifetime.",        grind: 1000, mult: 1.20, test: s => s.lifetimeGrind >= 1e5 },
+  { id: "first_blood", name: "First Blood",        desc: "Place your first machine.",            grind: 50,    mult: 1.00, test: s => s.totalMachines >= 1 },
+  { id: "ten_rigs",    name: "Tooled Up",          desc: "Own 10 machines.",                     grind: 100,   mult: 1.01, test: s => s.totalMachines >= 10 },
+  { id: "millionaire", name: "Millionaire",        desc: "Bank $1,000,000 lifetime.",            grind: 250,   mult: 1.02, test: s => s.lifetimeCash >= 1e6 },
+  { id: "first_link",  name: "Supply Lines",       desc: "Run a 3-tier chain.",                  grind: 150,   mult: 1.01, test: s => s.deepestTier >= 3 },
+  { id: "merge1",      name: "Fusion",             desc: "Perform your first merge.",            grind: 200,   mult: 1.02, test: s => s.totalMerges >= 1 },
+  { id: "chip",        name: "Keystone",           desc: "Unlock the Fab Core (Microchips).",    grind: 400,   mult: 1.03, test: s => s.deepestTier >= 5 },
+  { id: "billionaire", name: "Billionaire",        desc: "Bank $1,000,000,000 lifetime.",        grind: 600,   mult: 1.03, test: s => s.lifetimeCash >= 1e9 },
+  { id: "first_ship",  name: "Ship It",            desc: "Prestige for the first time.",         grind: 500,   mult: 1.05, test: s => s.totalPrestiges >= 1 },
+  { id: "gold",        name: "Now We're Printing", desc: "Unlock the Gold Mint.",                grind: 800,   mult: 1.04, test: s => s.deepestTier >= 6 },
+  { id: "blueprint1",  name: "Blueprinted",        desc: "Open your first blueprint pack.",      grind: 300,   mult: 1.02, test: s => s.totalPulls >= 1 },
+  { id: "legendary",   name: "Heavy Plates",       desc: "Pull a Legendary blueprint.",          grind: 1200,  mult: 1.06, test: s => s.bestRarity >= 3 },
+  { id: "refinery",    name: "Pure Product",       desc: "Unlock the Grind Refinery (T8).",      grind: 2000,  mult: 1.08, test: s => s.deepestTier >= 8 },
+  { id: "trillion",    name: "Trillionaire",       desc: "Bank $1,000,000,000,000 lifetime.",    grind: 1500,  mult: 1.05, test: s => s.lifetimeCash >= 1e12 },
+  { id: "ship5",       name: "Repeat Offender",    desc: "Prestige 5 times.",                    grind: 1750,  mult: 1.07, test: s => s.totalPrestiges >= 5 },
+  { id: "hundred",     name: "Floor Boss",         desc: "Own 100 of a single line.",            grind: 1000,  mult: 1.05, test: s => s.maxLineCopies >= 100 },
+  { id: "merge10",     name: "Fusion Addict",      desc: "Merge 10 times.",                      grind: 1100,  mult: 1.05, test: s => s.totalMerges >= 10 },
+  { id: "mythic",      name: "Singularity",        desc: "Pull a Mythic blueprint.",             grind: 4000,  mult: 1.12, test: s => s.bestRarity >= 4 },
+  { id: "googol",      name: "Off The Charts",     desc: "Bank $1e30 lifetime.",                 grind: 3000,  mult: 1.08, test: s => s.lifetimeCash >= 1e30 },
+  { id: "ship25",      name: "Kingpin",            desc: "Prestige 25 times.",                   grind: 5000,  mult: 1.15, test: s => s.totalPrestiges >= 25 },
+  { id: "whale",       name: "House Always Wins",  desc: "Bank 1,000,000 $GRIND lifetime.",        grind: 10000, mult: 1.20, test: s => s.lifetimeGrind >= 1e6 },
 ];
 
 // rarity index for "bestRarity" comparisons

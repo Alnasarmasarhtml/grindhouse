@@ -94,7 +94,7 @@ export const GH = {
     offlineCapHoursStaking: 12,   // while staking
     // prestige: GRIND = floor(K * (lifetimeCashThisRun / SCALE) ^ EXP)
     prestige: {
-      K: 4,
+      K: 40,
       SCALE: 1e9,
       EXP: 0.40,                  // flat curve => perpetual carrot
       costInflationPerLoop: 1.6,  // MUCH gentler than Supply Chain Idle's x45
@@ -146,13 +146,13 @@ export const GH = {
       enabled: true,
       softDecay: true,            // miss a day → drop ONE rung (not reset to day 1)
       ladder: [                   // grind = practice-$GRIND; surge/perk = a granted boost id
-        { grind: 50 },
-        { grind: 80 },
-        { grind: 120, surge: "spark" },
-        { grind: 180 },
-        { grind: 260 },
-        { grind: 360, perk: "speed" },
-        { grind: 600, surge: "overdrive", big: true },
+        { grind: 500 },
+        { grind: 800 },
+        { grind: 1200, surge: "spark" },
+        { grind: 1800 },
+        { grind: 2600 },
+        { grind: 3600, perk: "speed" },
+        { grind: 6000, surge: "overdrive", big: true },
       ],
     },
 
@@ -160,24 +160,24 @@ export const GH = {
     freeWheel: {
       enabled: true,
       spinsPerDay: 1,
-      dailyPotGrind: 100_000,     // hard cap of practice-$GRIND the FREE wheel can pay out per day across everyone (the "$100 in tokens" cap). Once drained, free spins pay the floor only.
-      floorGrind: 10,             // minimum a spin always pays even if the pot is dry
+      dailyPotGrind: 1_000_000,     // hard cap of practice-$GRIND the FREE wheel can pay out per day across everyone (the "$100 in tokens" cap). Once drained, free spins pay the floor only.
+      floorGrind: 100,             // minimum a spin always pays even if the pot is dry
       segments: [                 // weighted; prize = grind | surge | perk
-        { label: "10",     grind: 10,   weight: 30 },
-        { label: "25",     grind: 25,   weight: 22 },
-        { label: "50",     grind: 50,   weight: 16 },
+        { label: "100",    grind: 100,   weight: 30 },
+        { label: "250",    grind: 250,   weight: 22 },
+        { label: "500",    grind: 500,   weight: 16 },
         { label: "×1.5",   surge: "spark", weight: 9 },
-        { label: "100",    grind: 100,  weight: 11 },
-        { label: "250",    grind: 250,  weight: 7 },
+        { label: "1000",   grind: 1000,  weight: 11 },
+        { label: "2500",   grind: 2500,  weight: 7 },
         { label: "SPEED",  perk: "speed", weight: 3 },
-        { label: "1000",   grind: 1000, weight: 2 },
+        { label: "10000",  grind: 10000, weight: 2 },
       ],
     },
 
     // ----- PAID FORTUNE WHEEL — pay $GRIND, win PERKS (boosts/speed-ups). Fee → burn+treasury -----
     paidWheel: {
       enabled: true,
-      costGrind: 250,             // per spin
+      costGrind: 2500,            // per spin
       feeSplit: { burn: 0.5, treasury: 0.5 },   // the spent $GRIND is destroyed/treasuried (demo: vault accounting; live: real burn+buyback)
       segments: [                 // perks, not withdrawable token (legal keystone) — except a rare jackpot
         { label: "×1.5 SURGE", surge: "spark",     weight: 24 },
@@ -188,7 +188,7 @@ export const GH = {
         { label: "BLUEPRINT",  perk: "blueprint",  weight: 8 },
         { label: "×5 SURGE",   surge: "kingpin",   weight: 3 },
         { label: "MISS",       perk: "none",       weight: 5 },
-        { label: "5K JACKPOT", grind: 5000,        weight: 1 },
+        { label: "50K JACKPOT", grind: 50000,     weight: 1 },
       ],
     },
 
@@ -196,10 +196,10 @@ export const GH = {
     surge: {
       enabled: true,
       tiers: {
-        spark:     { name: "Spark ×1.5",     mult: 1.5, hours: 24,  costGrind: 150 },
-        overdrive: { name: "Overdrive ×2",   mult: 2.0, hours: 24,  costGrind: 400 },
-        meltdown:  { name: "Meltdown ×3",    mult: 3.0, hours: 72,  costGrind: 1500 },
-        kingpin:   { name: "Kingpin ×5",     mult: 5.0, hours: 168, costGrind: 6000 },
+        spark:     { name: "Spark ×1.5",     mult: 1.5, hours: 24,  costGrind: 1500 },
+        overdrive: { name: "Overdrive ×2",   mult: 2.0, hours: 24,  costGrind: 4000 },
+        meltdown:  { name: "Meltdown ×3",    mult: 3.0, hours: 72,  costGrind: 15000 },
+        kingpin:   { name: "Kingpin ×5",     mult: 5.0, hours: 168, costGrind: 60000 },
       },
     },
 

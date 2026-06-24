@@ -99,26 +99,46 @@ function renderVault() {
     <div class="rw-vrow"><span>🎡 Free pot left today</span><b class="mono">${fmt(fw.potLeft)} / ${fmt(GH.rewards.freeWheel.dailyPotGrind)}</b></div>`;
 }
 
-/* ---------- the SVG wheel ---------- */
+/* ---------- the SVG wheel (color-coded wedges, upright value+name labels) ---------- */
+function shortG(n) { n = Math.floor(n || 0); if (n >= 1000) { const k = n / 1000; return (k % 1 ? k.toFixed(1) : k) + "K"; } return "" + n; }
+function segDisplay(seg) {
+  if (seg.grind != null) {
+    const jack = seg.grind >= 5000;
+    return { main: shortG(seg.grind), sub: jack ? "JACKPOT" : "$GRIND", wedge: jack ? "#251a05" : "#1b1407", color: jack ? "#FFD970" : "#FFCE6A" };
+  }
+  if (seg.surge) { const t = GH.rewards.surge.tiers[seg.surge]; return { main: "×" + (t ? t.mult : ""), sub: "SURGE", wedge: "#181327", color: "#B79BFF" }; }
+  if (seg.perk === "speed")     return { main: "⏩", sub: "SPEED-UP",  wedge: "#0b1c22", color: "#5BE3FF" };
+  if (seg.perk === "cash2")     return { main: "×2", sub: "CASH RUSH", wedge: "#0c1d13", color: "#5BE38C" };
+  if (seg.perk === "blueprint") return { main: "◈",  sub: "BLUEPRINT", wedge: "#221029", color: "#FF7FDC" };
+  if (seg.perk === "none")      return { main: "✕",  sub: "MISS",      wedge: "#141319", color: "#7E7A70" };
+  return { main: (seg.label || "").toString(), sub: "", wedge: "#141319", color: "#ECE8DF" };
+}
 function buildWheel(segments) {
-  const N = segments.length, seg = 360 / N, cx = 160, cy = 160, r = 150;
-  const pt = (ang, rad) => { const a = (ang) * Math.PI / 180; return [cx + rad * Math.sin(a), cy - rad * Math.cos(a)]; };
+  const N = segments.length, seg = 360 / N, cx = 180, cy = 180, r = 168;
+  const pt = (ang, rad) => { const a = ang * Math.PI / 180; return [cx + rad * Math.sin(a), cy - rad * Math.cos(a)]; };
   let slices = "", labels = "";
   for (let i = 0; i < N; i++) {
     const a0 = i * seg - seg / 2, a1 = i * seg + seg / 2;
     const [x0, y0] = pt(a0, r), [x1, y1] = pt(a1, r);
-    const fill = i % 2 ? "#1b1922" : "#13121a";
-    slices += `<path d="M${cx} ${cy} L${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${fill}" stroke="#3a3142" stroke-width="1"/>`;
-    const seglabel = (segments[i].label || "").toString();
-    labels += `<text x="${cx}" y="${cy - r * 0.62}" transform="rotate(${i * seg} ${cx} ${cy})" text-anchor="middle" class="rw-seglabel">${seglabel}</text>`;
+    const d = segDisplay(segments[i]);
+    slices += `<path d="M${cx} ${cy} L${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${d.wedge}" stroke="#2c2838" stroke-width="1.2"/>`;
+    const rot = i * seg, flip = rot > 90 && rot < 270;
+    const vy = cy - r * 0.66, ny = vy + 16, ctrY = (vy + ny) / 2;
+    const tf = flip ? `rotate(${rot} ${cx} ${cy}) rotate(180 ${cx} ${ctrY})` : `rotate(${rot} ${cx} ${cy})`;
+    const v = `<text x="${cx}" y="${flip ? ny : vy}" text-anchor="middle" class="rw-segv" fill="${d.color}">${d.main}</text>`;
+    const n = d.sub ? `<text x="${cx}" y="${flip ? vy : ny}" text-anchor="middle" class="rw-segn">${d.sub}</text>` : "";
+    labels += `<g transform="${tf}">${v}${n}</g>`;
   }
-  return `<svg viewBox="0 0 320 320" class="rw-wheelsvg">
-    <circle cx="${cx}" cy="${cy}" r="${r + 6}" fill="#0a090e" stroke="#F5A623" stroke-width="3"/>
+  return `<svg viewBox="0 0 360 360" class="rw-wheelsvg">
+    <defs><radialGradient id="rwSheen" cx="50%" cy="40%" r="62%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".07"/><stop offset="70%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="${cx}" cy="${cy}" r="${r + 8}" fill="#0a090e" stroke="#F5A623" stroke-width="4"/>
     <g class="rw-rotor" data-rot="0">${slices}${labels}</g>
-    <circle cx="${cx}" cy="${cy}" r="26" fill="#15151a" stroke="#F5A623" stroke-width="2"/>
-    <text x="${cx}" y="${cy + 5}" text-anchor="middle" class="rw-hub">$</text>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#rwSheen)" pointer-events="none"/>
+    <circle cx="${cx}" cy="${cy}" r="30" fill="#15151a" stroke="#F5A623" stroke-width="2.5"/>
+    <text x="${cx}" y="${cy + 7}" text-anchor="middle" class="rw-hub">$</text>
   </svg>
-  <div class="rw-pointer">▼</div>`;
+  <div class="rw-pointer"></div>`;
 }
 function spinTo(rotor, idx, N, done) {
   const seg = 360 / N;

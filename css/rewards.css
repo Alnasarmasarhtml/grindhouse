@@ -65,13 +65,16 @@
 /* ============================ WHEEL MODAL ============================ */
 .modal-wrap.wheel .modal{ max-width:380px; text-align:center; }
 .rw-wheelmodal h2.m-title{ margin-bottom:14px; }
-.rw-wheelstage{ position:relative; width:300px; max-width:84vw; margin:0 auto 14px; aspect-ratio:1/1; }
-.rw-wheelsvg{ width:100%; height:100%; display:block; filter:drop-shadow(0 10px 30px rgba(0,0,0,.5)); }
+.rw-wheelstage{ position:relative; width:324px; max-width:86vw; margin:0 auto 16px; aspect-ratio:1/1; }
+.rw-wheelsvg{ width:100%; height:100%; display:block; filter:drop-shadow(0 12px 34px rgba(0,0,0,.55)); }
 .rw-rotor{ transform-box:fill-box; transform-origin:50% 50%; }
-.rw-seglabel{ fill:var(--bone,#ece8df); font-family:var(--mono,monospace); font-size:13px; font-weight:700; }
-.rw-hub{ fill:var(--gold-hi,#ffc24b); font-family:var(--disp,sans-serif); font-size:22px; font-weight:900; }
-.rw-pointer{ position:absolute; top:-6px; left:50%; transform:translateX(-50%); color:var(--gold-hi); font-size:1.5rem;
-  text-shadow:0 2px 6px #000; z-index:2; pointer-events:none; }
+.rw-segv{ font-family:var(--disp,sans-serif); font-stretch:115%; font-weight:800; font-size:19px; paint-order:stroke;
+  stroke:rgba(0,0,0,.55); stroke-width:.6px; }
+.rw-segn{ fill:#9b978d; font-family:var(--mono,monospace); font-weight:700; font-size:8.5px; letter-spacing:.08em; }
+.rw-hub{ fill:var(--gold-hi,#ffc24b); font-family:var(--disp,sans-serif); font-size:24px; font-weight:900; }
+.rw-pointer{ position:absolute; top:-3px; left:50%; transform:translateX(-50%); width:0; height:0; z-index:3; pointer-events:none;
+  border-left:13px solid transparent; border-right:13px solid transparent; border-top:21px solid var(--gold-hi,#ffc24b);
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
 .rw-result{ min-height:1.6em; font-size:.95rem; color:var(--mut); margin-bottom:14px; }
 .rw-result .rw-won{ color:var(--gold-hi); font-family:var(--disp); font-stretch:125%; font-size:1.3rem; }
 .rw-go{ width:100%; margin-bottom:8px; }
