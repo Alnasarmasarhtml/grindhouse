@@ -149,8 +149,8 @@ export function refreshWalletUI(state) {
     }
     const status = $("#bankStatus");
     if (status) status.textContent = isLive()
-      ? "$GRIND is live. Activated Operators earn a real, capped weekly drip — claim it to your wallet."
-      : "Free demo. This number is a practice score — NOT claimable $GRIND, and it resets at launch. At TGE, activated Operators earn a real, capped weekly $GRIND drip.";
+      ? "$GRIND is live. Activate your Operator License to claim your airdrop, straight to your wallet."
+      : "Free demo — this $GRIND is your launch airdrop. At launch you activate an Operator License (SOL first, then $GRIND) to claim your share of the fixed pool. Capped, not guaranteed.";
   }
 }
 
@@ -220,8 +220,8 @@ function openConnectModal(game, needInstall, name, pk) {
   wrap.innerHTML = `<div class="modal">
     <h2 class="m-title">${needInstall ? "NO SOLANA WALLET FOUND" : "WALLET LINKED"}</h2>
     <p class="m-body">${needInstall
-      ? "You don't need a wallet to play the demo. At launch, connect one to activate an Operator License and earn a real, capped weekly $GRIND drip."
-      : `Linked to <b>${name}</b> · <span class="mono">${shortKey(pk, 5)}</span>. Earning is a free demo until launch — your number is a practice score, not $GRIND.`}</p>
+      ? "You don't need a wallet to play the demo. At launch, connect one to activate an Operator License and claim the airdrop you grinded."
+      : `Linked to <b>${name}</b> · <span class="mono">${shortKey(pk, 5)}</span>. Keep grinding — the $GRIND you grind is your airdrop, claimed when you activate at launch.`}</p>
     <div class="m-row">
       ${needInstall
         ? `<a class="cta" href="https://phantom.app/" target="_blank" rel="noopener">GET PHANTOM</a><button class="cta ghost x">LATER</button>`
@@ -247,14 +247,14 @@ function simpleModal(title, bodyHtml, btn = "KEEP PLAYING") {
 
 export function openClaimAtLaunch() {
   simpleModal("THE TOKEN ISN'T LIVE YET — THAT'S YOUR EDGE.",
-    "Right now this is a <b>free practice floor</b> — the number you see is a demo score, <b>not</b> a $GRIND entitlement, and it resets at launch. At TGE, activated <b>Operators</b> earn a real, <b>capped weekly drip</b> of $GRIND (the season pool halves each week — early is real). No wallet drained, no inflation, no rug.");
+    "Right now this is a <b>free demo</b> — and the $GRIND you grind is your <b>launch airdrop</b>. At launch, activate an <b>Operator License</b> (SOL first, then $GRIND, burned) to claim your share of a fixed, capped pool — sized by what you grinded. The license keeps bots out, so the pool goes to real grinders. No wallet drained, no inflation, no rug.");
 }
 
 export function openActivateAtLaunch(tier) {
   const a = GH.chain.activation;
   const fee = tier?.feeSolValue ?? a.feeSolValue;
   simpleModal(`${a.licenseName.toUpperCase()} — OPENS AT LAUNCH`,
-    `At launch, a per-season <b>${a.licenseName}</b> — bought in <b>$GRIND worth ≈${fee} SOL</b> and <b>burned</b> — unlocks <b>real, capped, claimable $GRIND</b> on a weekly drip. Paying in $GRIND is the whole point: it gives the coin real utility (you buy &amp; burn it to play-to-earn) and it keeps bots out, since every farming account must buy in first. <b>Right now nothing here is real money</b> — it's a free demo.`);
+    `At launch, a per-season <b>${a.licenseName}</b> — first season ≈${fee} SOL, renewals in <b>$GRIND</b> (burned) — unlocks your <b>airdrop</b>: your share of a fixed, capped pool of real $GRIND, sized by what you grinded. The license is the anti-bot gate — every account pays in, and extra accounts only split the pool thinner, so farmers lose. <b>Right now it's a free demo</b>; the only binding rules are those published at launch.`);
 }
 
 // expose for the bank/license buttons (bound in play.html after import)

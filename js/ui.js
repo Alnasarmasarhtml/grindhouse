@@ -236,7 +236,7 @@ function modal(html, cls = "") {
 export function disclaimer(onAck) {
   const m = modal(`
     <h2 class="m-title">BEFORE YOU GRIND — STRAIGHT TALK.</h2>
-    <p class="m-body">$GRIND is a <b>volatile token</b>. GRIND HOUSE is a game — entertainment first. You may earn less than you spend, or nothing. Never spend what you can't afford to lose. Right now this is a <b>free demo</b>: your number is a practice score, not $GRIND, and it resets at launch.</p>
+    <p class="m-body">$GRIND is a <b>volatile token</b> and can go to zero. GRIND HOUSE is a game — entertainment first. Right now it's a <b>free demo</b>: the $GRIND you grind is your <b>airdrop at launch</b>, claimed by activating an Operator License — capped and not guaranteed. Never spend what you can't afford to lose.</p>
     <button class="cta big-cta ack">I UNDERSTAND — LET'S GRIND</button>
   `, "disc");
   m.wrap.querySelector(".ack").addEventListener("click", () => { onAck(); m.close(); });
@@ -383,7 +383,7 @@ const NUDGES = [
   { label: "Walled out? Hit SHIP IT for your first $GRIND",
     done:  (st) => st.totalPrestiges >= 1,
     flash: "#shipBtn",
-    toast: "SHIPPED. +demo score — real $GRIND drips for licensed Operators at launch. Run it back." },
+    toast: "SHIPPED. +$GRIND banked toward your launch airdrop. Run it back." },
 ];
 
 let _objIdx = 0, _objInit = false;
@@ -483,9 +483,9 @@ function openHelp() {
     <div class="ftue-rows help-loop">
       <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/t0_scrap.png" alt=""></span><div><b>BUILD machines.</b><span>They grind junk into money, even offline.</span></div></div>
       <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/cash.png" alt=""></span><div><b>THEY PRINT.</b><span>24/7, asleep or away.</span></div></div>
-      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/token.png" alt=""></span><div><b>BANK $GRIND.</b><span>Claim the real coin at launch.</span></div></div>
+      <div class="ftue-row"><span class="ftue-ic"><img src="assets/img/token.png" alt=""></span><div><b>BANK $GRIND.</b><span>What you grind is your launch airdrop.</span></div></div>
     </div>
-    <p class="help-one"><b>CASH builds</b> (game money, can't cash out). <b>$GRIND pays</b> (the real coin, claim at launch).</p>
+    <p class="help-one"><b>CASH builds</b> (game money, can't cash out). <b>$GRIND pays</b> (the real coin — what you grind is your airdrop, claimed at launch).</p>
     <div class="help-gloss">${gloss}</div>
     <div class="m-row"><button class="cta ghost help-replay">Replay tutorial</button><button class="cta help-ok">GOT IT</button></div>
     <p class="help-reassure">Lost? You can't break it. Tap, build, print.</p>
