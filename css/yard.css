@@ -90,7 +90,7 @@
 .recenter{ display:none; }   /* camera is fixed & stable — recenter not needed */
 
 /* OVERDRIVE — the "big move": tap to spend energy for a ×N CASH burst */
-.overdrive-fab{ position:absolute; left:10px; bottom:10px; z-index:7; display:flex; align-items:center; gap:6px;
+.overdrive-fab{ position:absolute; left:10px; bottom:62px; z-index:7; display:flex; align-items:center; gap:6px;
   font-family:var(--disp); font-stretch:115%; font-weight:800; font-size:.74rem; letter-spacing:.05em; color:#0a090e;
   background:linear-gradient(180deg,var(--gold-hi),var(--gold)); padding:9px 13px; clip-path:var(--cut-sm); cursor:pointer;
   box-shadow:0 4px 14px rgba(245,166,35,.4); transition:filter .15s, box-shadow .15s; }

@@ -77,7 +77,7 @@ export function updateHUD(state, flows) {
       ob.classList.remove("active");
       const ready = e >= od.energyCost;
       ob.classList.toggle("ready", ready); ob.classList.toggle("cant", !ready);
-      if (txt) txt.textContent = "OVERDRIVE";
+      if (txt) txt.textContent = "BOOST";
     }
   }
   // ship button state
@@ -349,7 +349,7 @@ function spark(x, y, color, big = false) {
 const GLOSSARY = {
   cash:      "Game money. Earn it selling, spend it building. Can't be cashed out — that's why it's safe to print forever.",
   grind:     "The real Solana coin. Fixed 1B. Bank now, claim to your wallet at launch.",
-  energy:    "Juice for OVERDRIVE. Tap ⚡ OVERDRIVE on the yard to spend it for a ×3 CASH burst. Refills on its own.",
+  energy:    "Juice for BOOST. Tap ⚡ BOOST on the yard to spend it for a ×3 CASH burst. Refills on its own.",
   merge:     "Smash 3 of the same machine into 1 of the next tier. How you climb.",
   shipit:    "Reset the floor for a permanent boost + a $GRIND drop. Not a reset — a power-up.",
   overclock: "Pay CASH to make one machine print faster. Forever.",

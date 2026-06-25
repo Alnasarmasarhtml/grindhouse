@@ -59,7 +59,7 @@
 .surge-badge{ font-family:var(--mono); font-size:.66rem; font-weight:700; color:#0a090e; background:var(--gold-hi);
   padding:3px 8px; clip-path:var(--cut-sm); letter-spacing:.02em; }
 .tab.has-ready{ position:relative; }
-.tab.has-ready::after{ content:""; position:absolute; top:6px; right:calc(50% - 26px); width:7px; height:7px; border-radius:50%;
+.tab.has-ready::before{ content:""; position:absolute; top:6px; right:calc(50% - 26px); width:7px; height:7px; border-radius:50%;
   background:var(--gold-hi); box-shadow:0 0 8px var(--gold-hi); }
 
 /* ============================ WHEEL MODAL ============================ */
