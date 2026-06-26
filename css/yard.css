@@ -168,6 +168,16 @@
 .ins-actions .btn{ justify-content:space-between; padding:.66em .9em; clip-path:var(--cut-sm); box-shadow:inset 0 0 0 1.2px var(--hair-2); }
 .ins-actions .btn:hover{ box-shadow:inset 0 0 0 1.2px var(--gold); color:var(--gold-hi); }
 .ins-mg[disabled]{ opacity:.4; pointer-events:none; }
+/* refinery $GRIND stake panel */
+.ins-stake{ background:linear-gradient(180deg,rgba(245,166,35,.12),rgba(245,166,35,.03)); box-shadow:inset 0 0 0 1px rgba(245,166,35,.38);
+  clip-path:var(--cut-sm); padding:11px 13px; margin-bottom:12px; }
+.ins-stake-top{ display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:.6rem; letter-spacing:.12em; color:var(--gold-hi); }
+.ins-stake-top b{ font-size:.78rem; color:var(--gold-hi); }
+.ins-stake-note{ font-size:.7rem; line-height:1.45; color:var(--mut); margin:6px 0 10px; }.ins-stake-note b{ color:var(--bone); }
+.ins-stake-btn{ width:100%; justify-content:space-between; }
+.ins-stake-btn[disabled]{ opacity:.45; pointer-events:none; }
+#grindSub.boosted{ color:var(--gold-hi); }
+.m-prize .big.gold{ color:var(--gold-hi); }
 .ins-actions .hlp{ display:inline-grid; place-items:center; width:14px; height:14px; border-radius:50%; margin-left:6px;
   font-family:var(--mono); font-size:.56rem; color:var(--dim); box-shadow:inset 0 0 0 1px var(--hair-2); cursor:help; }
 

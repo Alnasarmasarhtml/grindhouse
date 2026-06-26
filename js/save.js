@@ -32,6 +32,7 @@ export function freshState() {
     energyTs: now,
     overdriveUntil: 0,     // OVERDRIVE active until this ts (×N CASH burst)
     staking: { locked: 0, until: 0 },
+    refineryStake: { level: 0, locked: 0 },  // $GRIND staked on the GRIND REFINERY → output multiplier
     stats: { totalMerges: 0, totalPulls: 0, bestRarity: -1 },
     settings: { sound: GH.flags.soundDefaultOn },
     wallet: null,          // connected pubkey (string) once linked
@@ -79,6 +80,7 @@ function reconcile(s) {
   merged.stats = { ...base.stats, ...(s.stats || {}) };
   merged.settings = { ...base.settings, ...(s.settings || {}) };
   merged.staking = { ...base.staking, ...(s.staking || {}) };
+  merged.refineryStake = { ...base.refineryStake, ...(s.refineryStake || {}) };
   merged.license = { ...base.license, ...(s.license || {}) };
   merged.rewards = { ...base.rewards, ...(s.rewards || {}) };
   merged.rewards.surge = { ...base.rewards.surge, ...(s.rewards?.surge || {}) };

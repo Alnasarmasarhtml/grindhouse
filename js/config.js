@@ -90,7 +90,7 @@ export const GH = {
     startingCash: 50,             // enough to place your first machine
     costGrowth: 1.11,             // cost_next = base * growth^owned (Moderate — steeper so you can't max in 30 min; ~3x slower than 1.09 to stack a line)
     sellTickMs: 1000,             // how often the dock sells / cash ticks
-    offlineCapHours: 4,           // base offline accrual cap
+    offlineCapHours: 8,           // base offline accrual cap
     offlineCapHoursStaking: 12,   // while staking
     // prestige: GRIND = floor(K * (lifetimeCashThisRun / SCALE) ^ EXP)
     prestige: {
@@ -107,6 +107,17 @@ export const GH = {
     mergeBonus: 1.5,              // permanent line multiplier per merge
     milestones: [10, 25, 50, 100, 200, 300, 500], // copies -> x2 that line
     milestoneMult: 2,
+    // ---- $GRIND faucet: the GRIND REFINERY (top of chain) refines its output into $GRIND/sec ----
+    grind: {
+      refineryConv: 1.0,        // $GRIND per unit of refinery throughput/sec (the demo airdrop faucet — tune for feel)
+      stake: {
+        baseCost: 500,          // first stake, in $GRIND ("not much")
+        costGrowth: 1.55,       // each stake level costs more
+        boostPerLevel: 0.10,    // +0.1× refinery $GRIND output per level (×1.1, ×1.2, …)
+        burnPct: 0.5,           // half of each stake is BURNED (deflation), half locked on the machine
+        maxLevel: 100,
+      },
+    },
   },
 
   /* ---------------- SUPPLY / ALLOCATION (for the tokenomics page) ---------------- */

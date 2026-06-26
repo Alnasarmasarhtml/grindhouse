@@ -75,8 +75,18 @@ export function globalOutputMult(state) {
   return prestige * achievementMult(state) * bp.outputMult;
 }
 
+/* ---------- refinery $GRIND stake (boost the top machine's $GRIND output) ---------- */
+export function stakeMult(state) {
+  const lv = state.refineryStake?.level || 0;
+  return 1 + E.grind.stake.boostPerLevel * lv;
+}
+export function stakeCost(state) {
+  const g = E.grind.stake, lv = state.refineryStake?.level || 0;
+  return Math.ceil(g.baseCost * Math.pow(g.costGrowth, lv));
+}
+
 /* ---------- the core flow simulation ----------
-   returns { caps, flow, surplus, income, bottleneck } */
+   returns { caps, flow, surplus, income, grindPerSec, bottleneck } */
 export function computeFlows(state) {
   const gMult = globalOutputMult(state);
   const sellMult = blueprintProducts(state).sellMult;
@@ -102,17 +112,20 @@ export function computeFlows(state) {
   for (let i = 0; i < n; i++) {
     const consumedByNext = (i < n - 1) ? flow[i + 1] * LINES[i + 1].input : 0;
     surplus[i] = Math.max(0, flow[i] - consumedByNext);
-    income += surplus[i] * LINES[i].sell * sellMult;
+    if (i < n - 1) income += surplus[i] * LINES[i].sell * sellMult;   // CASH from t0..t7
   }
+  // top of the chain (GRIND REFINERY) refines its surplus into $GRIND/sec — the demo airdrop faucet
+  const grindPerSec = (surplus[n - 1] || 0) * E.grind.refineryConv * stakeMult(state);
   // bottleneck = lowest line that's starved (running below capacity due to input)
   let bottleneck = -1;
   for (let i = 1; i < n; i++) {
     if (caps[i] > 0 && flow[i] < caps[i] * 0.995) { bottleneck = i - 1; break; }
   }
-  return { caps, flow, surplus, income, bottleneck, gMult, sellMult };
+  return { caps, flow, surplus, income, grindPerSec, bottleneck, gMult, sellMult };
 }
 
 export function incomePerSec(state) { return computeFlows(state).income; }
+export function grindPerSec(state) { return computeFlows(state).grindPerSec; }
 
 /* ---------- unlocking ---------- */
 export function isUnlocked(state, idx) {
@@ -140,8 +153,8 @@ export function offlineEarnings(state, elapsedSec) {
   const stakingBonus = state.staking?.locked ? E.offlineCapHoursStaking : E.offlineCapHours;
   const capSec = stakingBonus * 3600 * bp.offlineMult;
   const sec = Math.min(elapsedSec, capSec);
-  const rate = incomePerSec(state);
-  return { cash: rate * sec, cappedSec: sec, capSec, rate };
+  const f = computeFlows(state);
+  return { cash: f.income * sec, grind: f.grindPerSec * sec, cappedSec: sec, capSec, rate: f.income, grindRate: f.grindPerSec };
 }
 
 /* ---------- energy ---------- */

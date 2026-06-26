@@ -61,6 +61,10 @@ export function updateHUD(state, flows) {
   setText("#cashRate", fmtRate(flows.income * odMult));
   const cr = $("#cashRate"); if (cr) cr.classList.toggle("boosted", odOn);
   setText("#grind", fmtGrind(disp.grind));
+  // $GRIND rate — the refinery printing your airdrop
+  const gr = flows.grindPerSec || 0;
+  const gsub = $("#grindSub");
+  if (gsub) { gsub.textContent = gr > 0 ? `+${fmtGrind(gr)}/s · airdrop` : "$GRIND · airdrop"; gsub.classList.toggle("boosted", gr > 0); }
   // energy
   const e = state.energy ?? 0, em = GH.economy.energy.max;
   setText("#energy", `${Math.floor(e)}/${em}`);
@@ -243,10 +247,12 @@ export function disclaimer(onAck) {
 }
 
 export function welcomeBack(off, onCollect) {
+  const cashLine = off.cash > 0 ? `<div class="m-prize"><span class="big">${fmtCash(off.cash)}</span><small>CASH banked</small></div>` : "";
+  const grindLine = off.grind > 0 ? `<div class="m-prize"><span class="big gold">${fmtGrind(off.grind)}</span><small>$GRIND grinded → your airdrop</small></div>` : "";
   const m = modal(`
     <h2 class="m-title">THE HOUSE NEVER SLEPT.</h2>
     <p class="m-body">While you were gone, your floor kept grinding for <b>${fmtTime(off.cappedSec)}</b>.</p>
-    <div class="m-prize"><span class="big">${fmtCash(off.cash)}</span><small>banked</small></div>
+    ${cashLine}${grindLine}
     <button class="cta big-cta">COLLECT</button>
   `, "welcome");
   m.wrap.querySelector(".cta").addEventListener("click", () => { onCollect(); coinShower(); m.close(); });

@@ -9,7 +9,7 @@ import { CONTENT_W, CONTENT_H, PLOT, PLOTS, toScreen, zOf, scaleOf } from "./iso
 import { LINES, OVERCLOCK } from "./data.js";
 import { GH } from "./config.js";
 import * as Eco from "./economy.js";
-import { fmtCash, fmtRate } from "./format.js";
+import { fmtCash, fmtRate, fmtGrind } from "./format.js";
 import { artSrc, stageClass, stageFor, STAGE_NAME, STAGE_LV } from "./evolution.js";
 import * as UI from "./ui.js";
 
@@ -250,6 +250,8 @@ function renderInspector() {
   const c1 = Eco.bulkCost(L, cp, 1);
   const surplus = G.flows.surplus[i] || 0;
   const rate = surplus * L.sell * (G.flows.sellMult || 1);
+  const isRefinery = i === LINES.length - 1;
+  const grindRate = isRefinery ? (G.flows.grindPerSec || 0) : 0;
   const ocMax = ls.overclock >= OVERCLOCK.maxLevel;
   const ocCost = Eco.overclockCost(L, ls.overclock);
   const canMerge = cp >= GH.economy.mergeCount && i < LINES.length - 1;
@@ -264,6 +266,7 @@ function renderInspector() {
   let statusHtml;
   if (cp === 0) statusHtml = `<div class="ins-status build">Not built yet — hit <b>BUILD</b> to activate it.</div>`;
   else if (starved && prevL) statusHtml = `<div class="ins-status warn">⚠ <b>Starved.</b> Not enough <b>${prevL.product}</b> coming in — upgrade <b>${prevL.machine}</b> to feed it.<button class="ins-feed" data-feed="${prevL.id}">FEED IT → ${prevL.machine}</button></div>`;
+  else if (isRefinery) statusHtml = `<div class="ins-status ok">Refining the chain into <b>+${fmtGrind(grindRate)} $GRIND/s</b> — this is your <b>airdrop</b>. Feed it harder or stake to mint more.</div>`;
   else if (rate <= 0 && i < LINES.length - 1) statusHtml = `<div class="ins-status ok">Running ✓ — all its output is feeding the <b>${LINES[i + 1].machine}</b>. Build more to sell the surplus.</div>`;
   else statusHtml = `<div class="ins-status ok">Running ✓ — selling surplus for <b>+${fmtRate(rate)}</b>.</div>`;
 
@@ -281,7 +284,7 @@ function renderInspector() {
       ${statusHtml}
 
       <div class="ins-stats">
-        <div class="ins-stat"><span>OUTPUT</span><b class="live">${rate > 0 ? "+" + fmtRate(rate) : (starved ? "⚠" : "—")}</b></div>
+        <div class="ins-stat"><span>OUTPUT</span><b class="live">${isRefinery ? (grindRate > 0 ? "+" + fmtGrind(grindRate) + " $G/s" : (starved ? "⚠" : "—")) : (rate > 0 ? "+" + fmtRate(rate) : (starved ? "⚠" : "—"))}</b></div>
         <div class="ins-stat"><span>LEVEL</span><b>${cp}</b></div>
         <div class="ins-stat"><span>OVERCLOCK</span><b>${ls.overclock || 0}/${OVERCLOCK.maxLevel}</b></div>
         <div class="ins-stat"><span>STAGE</span><b>${st + 1}/4</b></div>
@@ -291,6 +294,12 @@ function renderInspector() {
         <div class="ins-stagebar-fill" style="width:${stagePct}%"></div>
         <span class="ins-stagebar-cap">${stageNote}</span>
       </div>
+
+      ${isRefinery ? `<div class="ins-stake">
+        <div class="ins-stake-top"><span>REFINERY STAKE</span><b class="mono">×${Eco.stakeMult(G.state).toFixed(1)} $GRIND output</b></div>
+        <p class="ins-stake-note">Lock $GRIND to mint faster. <b>Lv ${G.state.refineryStake?.level || 0}</b> · ${fmtGrind(G.state.refineryStake?.locked || 0)} locked · half of each stake <b>burned</b> 🔥.</p>
+        <button class="cta ins-stake-btn" ${G.state.grind >= Eco.stakeCost(G.state) ? "" : "disabled"}>STAKE → +×0.1 OUTPUT<span class="mono">${fmtGrind(Eco.stakeCost(G.state))} $GRIND</span></button>
+      </div>` : ""}
 
       <div class="ins-actions">
         <button class="cta ins-buy">${cp ? "UPGRADE" : "BUILD"}<span class="mono">${fmtCash(c1)}</span></button>
@@ -309,6 +318,7 @@ function renderInspector() {
   ins.querySelector(".ins-buymax")?.addEventListener("click", () => { G.buy(L.id, "max"); });
   ins.querySelector(".ins-oc")?.addEventListener("click", () => { G.overclock(L.id); });
   ins.querySelector(".ins-mg")?.addEventListener("click", () => { G.merge(L.id); });
+  ins.querySelector(".ins-stake-btn")?.addEventListener("click", () => { G.stakeRefinery(); });
 }
 
 // ---- camera: fit + pan, clamped so it never goes tiny or absurdly close ----

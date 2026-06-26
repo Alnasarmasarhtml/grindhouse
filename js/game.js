@@ -33,14 +33,13 @@ export const Game = {
     if (!this.state.ackRisk) UI.disclaimer(() => { this.state.ackRisk = true; save(this.state, true); UI.initFTUE(this); });
     else UI.initFTUE(this);
     this.recompute();
-    if (elapsed > 60 && Eco.incomePerSec(this.state) > 0) {
+    if (elapsed > 60) {
       const off = Eco.offlineEarnings(this.state, elapsed);
-      if (off.cash > 0) {
+      if (off.cash > 0 || off.grind > 0) {
         this._pendingOffline = off;
         UI.welcomeBack(off, () => {
-          this.state.cash += off.cash;
-          this.state.runCash += off.cash;
-          this.state.lifetimeCash += off.cash;
+          this.state.cash += off.cash; this.state.runCash += off.cash; this.state.lifetimeCash += off.cash;
+          if (off.grind > 0) { this.state.grind += off.grind; this.state.lifetimeGrind = (this.state.lifetimeGrind || 0) + off.grind; }
           Audio.play("collect");
           this.recompute(); this.refresh(); save(this.state, true);
         });
@@ -65,6 +64,13 @@ export const Game = {
       this.state.cash += gain;
       this.state.runCash += gain;
       this.state.lifetimeCash += gain;
+    }
+    // $GRIND faucet — the GRIND REFINERY mints $GRIND/sec (boosted by Surge); accrues idle + offline
+    const grindRate = (this.flows.grindPerSec || 0) * Rewards.surgeMult(this.state);
+    if (grindRate > 0) {
+      const g = grindRate * dt;
+      this.state.grind += g;
+      this.state.lifetimeGrind = (this.state.lifetimeGrind || 0) + g;
     }
     // energy regen
     this.state.energy = Eco.currentEnergy(this.state, Date.now());
@@ -116,6 +122,23 @@ export const Game = {
     this.refresh(); save(this.state, true);
   },
   overdriveLeftMs() { return Math.max(0, (this.state.overdriveUntil || 0) - Date.now()); },
+
+  // REFINERY STAKE — lock $GRIND on the GRIND REFINERY to boost its $GRIND output (×1.1, ×1.2, …)
+  stakeRefinery() {
+    const g = GH.economy.grind.stake;
+    const st = this.state.refineryStake || (this.state.refineryStake = { level: 0, locked: 0 });
+    if (st.level >= g.maxLevel) { UI.toast("Refinery stake maxed"); return; }
+    const cost = Eco.stakeCost(this.state);
+    if (this.state.grind < cost - 1e-6) { Audio.play("err"); UI.toast(`Need ${Math.ceil(cost)} $GRIND to stake`); return; }
+    this.state.grind -= cost;
+    const burn = cost * g.burnPct;
+    this.state.vault.burnedTotal += burn; this.state.vault.burnedToday += burn;
+    st.locked = (st.locked || 0) + (cost - burn);
+    st.level += 1;
+    Audio.play("upgrade");
+    UI.toast(`Refinery boosted → ×${(1 + g.boostPerLevel * st.level).toFixed(1)} $GRIND output`);
+    this.recompute(); this.refresh(); save(this.state, true);
+  },
 
   /* -------- ACTIONS -------- */
   buy(lineId, qty) {
